@@ -10,20 +10,20 @@
 
     <TextView
         android:id="@+id/dealLabel"
-        android:layout_width="67dp"
+        android:layout_width="74dp"
         android:layout_height="35dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Deal #: "
+        android:text="Dealt: "
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/dealCountLabel"
+        app:layout_constraintEnd_toStartOf="@+id/dealCountText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/dealCountLabel"
+        android:id="@+id/dealCountText"
         android:layout_width="26dp"
         android:layout_height="32dp"
         android:layout_marginTop="8dp"
@@ -47,14 +47,14 @@
         android:text="Hand Count:"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/dealCountLabel"
+        app:layout_constraintStart_toEndOf="@+id/dealCountText"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.498" />
 
     <TextView
         android:id="@+id/handCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"

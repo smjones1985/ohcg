@@ -35,11 +35,11 @@ public class RecordBids extends AppCompatActivity {
 //
 //            if(totalBidsForCurrentHand + bidAttempt == cardsDealt &&
 //                    recordBid());
-            recordBid(currentPlayer, String.valueOf(playerBid));
+            recordBid(currentPlayer, String.valueOf(playerBid.getText()));
 
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard_finish:
-
+                    //TODO verify that bids are valid
                     return true;
                 case R.id.navigation_dashboard_previous:
                     if(currentIndex - 1 < 0){
@@ -75,11 +75,14 @@ public class RecordBids extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_bids);
         maxIndex = Global.getRecordAdapter().getCount() - 1;
-        TextView dealCountLabelObject =  (TextView) findViewById(R.id.dealCountLabel);
-        if(dealCountLabelObject.getText() != null && !Global.isNewGame()) {
+        TextView dealCountLabelObject =  (TextView) findViewById(R.id.dealCountText);
+        if(dealCountLabelObject != null && dealCountLabelObject.getText() != null && !Global.isNewGame()) {
             cardsDealt = Integer.valueOf(String.valueOf(dealCountLabelObject));
         }else{
-            cardsDealt = 0;
+            //TODO cards dealt needs to be calculated based on number of players in the game, it is only ten if the count is less than
+            if(maxIndex + 1 < 6){
+                cardsDealt = 10;
+            }
         }
         List<ScoreBoardItem> players = Global.getRecordAdapter().getScoreBoardItems();
         players.stream().forEach(x -> x.setCurrentBid("0"));

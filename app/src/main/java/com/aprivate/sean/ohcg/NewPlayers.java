@@ -3,10 +3,8 @@ package com.aprivate.sean.ohcg;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -29,6 +27,25 @@ public class NewPlayers extends AppCompatActivity {
             onFinished(finishedAddingButtonObj);
         });
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        //TODO calculate cards to deal
+        int playerCount = Global.getRecordAdapter().getCount();
+
+        TextView dealCountLabelObject =  (TextView) findViewById(R.id.dealCountText);
+        TextView handCountLabelObject =  (TextView) findViewById(R.id.handCount);
+        int cardsToDeal = 10;
+
+        if(dealCountLabelObject != null && dealCountLabelObject.getText() != null) {
+            cardsToDeal = Integer.valueOf(String.valueOf(dealCountLabelObject));
+        }
+
+
+
+        // Otherwise defer to system default behavior.
+        super.onBackPressed();
     }
 
     private void onFinished(Button finishedAddingButtonObj) {
