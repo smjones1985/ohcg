@@ -27,25 +27,27 @@ public class NewPlayers extends AppCompatActivity {
             onFinished(finishedAddingButtonObj);
         });
 
-    }
+        ScoreBoardItem newPlayer = new ScoreBoardItem();
+        newPlayer.setCurrentBid("0");
+        newPlayer.setBoardRank("0");
+        newPlayer.setCurrentPoints("0");
+        newPlayer.setPlayerName("a");
+        Global.getRecordAdapter().add(newPlayer);
 
-    @Override
-    public void onBackPressed() {
-        //TODO calculate cards to deal
-        int playerCount = Global.getRecordAdapter().getCount();
+        ScoreBoardItem newPlayer2 = new ScoreBoardItem();
+        newPlayer2.setCurrentBid("0");
+        newPlayer2.setBoardRank("0");
+        newPlayer2.setCurrentPoints("0");
+        newPlayer2.setPlayerName("b");
+        Global.getRecordAdapter().add(newPlayer2);
 
-        TextView dealCountLabelObject =  (TextView) findViewById(R.id.dealCountText);
-        TextView handCountLabelObject =  (TextView) findViewById(R.id.handCount);
-        int cardsToDeal = 10;
+        ScoreBoardItem newPlaye3 = new ScoreBoardItem();
+        newPlaye3.setCurrentBid("0");
+        newPlaye3.setBoardRank("0");
+        newPlaye3.setCurrentPoints("0");
+        newPlaye3.setPlayerName("c");
+        Global.getRecordAdapter().add(newPlaye3);
 
-        if(dealCountLabelObject != null && dealCountLabelObject.getText() != null) {
-            cardsToDeal = Integer.valueOf(String.valueOf(dealCountLabelObject));
-        }
-
-
-
-        // Otherwise defer to system default behavior.
-        super.onBackPressed();
     }
 
     private void onFinished(Button finishedAddingButtonObj) {

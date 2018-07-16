@@ -2,19 +2,21 @@ package com.aprivate.sean.ohcg;
 
 public class Calculate {
     public static int CalculateFirstHand(int playerCount){
-       return  54 / playerCount;
+       int firstHand = 10;
+       if(54 / playerCount < 10){
+           firstHand = 54 / playerCount;
+       }
+       return firstHand;
     }
 
-    public static int CalculateWithEstablishedcardsDealt(int playerCount, int handCount){
+    public static int CalculateWithEstablishedCardsDealt(int playerCount, int handCount){
         int maxPossible = CalculateFirstHand(playerCount);
         int handsOneColumn = handCount % 10;
-        if(handsOneColumn <= 4){
-            return handsOneColumn;
-        } else if(handsOneColumn >= maxPossible){
-            return maxPossible;
-        } else{
-            return handsOneColumn;
+        if(handsOneColumn == 0){
+            handsOneColumn = 1;
         }
-
+        return handsOneColumn > maxPossible ? maxPossible : handsOneColumn;
     }
+
+
 }

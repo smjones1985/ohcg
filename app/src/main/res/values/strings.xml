@@ -9,4 +9,5 @@
     <string name="endGameStr">End Game</string>
     <string name="endHandStr">End Hand</string>
     <string name="beginHandStr">Begin Hand</string>
+    <string name="startGameStr">Start Game</string>
 </resources>

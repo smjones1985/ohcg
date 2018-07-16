@@ -1,5 +1,6 @@
 package com.aprivate.sean.ohcg;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,10 +13,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    private boolean handStarted;
+    private boolean gameStarted;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,15 +28,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         Button startGameButtonObj = (Button) findViewById(R.id.startEndGameButton);
         startGameButtonObj.setOnClickListener((view) -> {
@@ -55,21 +51,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onStartHandClick(Button startEndHandButtonObj) {
-        Button startGameButtonObj = (Button) findViewById(R.id.startEndGameButton);
-        if(String.valueOf(startEndHandButtonObj.getText()).equalsIgnoreCase(String.valueOf(R.string.endGameStr))){
-            if(String.valueOf(startEndHandButtonObj.getText()).equalsIgnoreCase(String.valueOf(R.string.endHandStr))){
-                startEndHandButtonObj.setText(R.string.beginHandStr);
-            }else {
-                startEndHandButtonObj.setText(R.string.endHandStr);
-            }
+        String handCount = ((TextView) findViewById(R.id.handCount)).getText().toString();
+        if(!handStarted){
+            handStarted = true;
+            startEndHandButtonObj.setText(R.string.beginHandStr);
+            Intent intent = new Intent(this, EndOfHand.class);
+            intent.putExtra("handCount", handCount);
+            intent.putExtra("newGame", gameStarted);
+            startActivityForResult(intent, Global.END_HAND);
         }else {
-            AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
-            dlgAlert.setMessage("You cannot begin the hand without starting the game");
-            dlgAlert.setTitle("Error");
-            dlgAlert.setCancelable(true);
-            dlgAlert.create().show();
+            handStarted = false;
+            startEndHandButtonObj.setText(R.string.endHandStr);
+            Intent intent = new Intent(this, RecordBids.class);
+            intent.putExtra("handCount", handCount);
+            intent.putExtra("newGame", gameStarted);
+            startActivityForResult(intent, Global.START_HAND);
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -94,27 +93,59 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onStartGameClick(View button){
-        int recordCount = Global.getRecordAdapter().getCount();
-        if(recordCount < 2){
-            AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
-            dlgAlert.setMessage("You must have at least two players");
-            dlgAlert.setTitle("Error");
-            dlgAlert.setCancelable(true);
-            dlgAlert.create().show();
+        Button startGameButtonObj = (Button) button;
+        if(!startGameButtonObj.getText().toString().equalsIgnoreCase(getString(R.string.endGameStr))) {
+            int recordCount = Global.getRecordAdapter().getCount();
+            if (recordCount < 2) {
+                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+                dlgAlert.setMessage("You must have at least two players");
+                dlgAlert.setTitle("Error");
+                dlgAlert.setCancelable(true);
+                dlgAlert.create().show();
+            } else {
+                gameStarted = true;
+                startGameButtonObj.setText(R.string.endGameStr);
+                onStartHandClick((Button) findViewById(R.id.startEndHandButton));
+            }
         }else{
-            Button startGameButtonObj = (Button) findViewById(button.getId());
-            Global.setNewGame(true);
-            Intent intent = new Intent(this, RecordBids.class);
-            startActivity(intent);
-            startGameButtonObj.setText(R.string.endGameStr);
+            gameStarted = false;
+            //calculate and display winner
+            //store result locally
+            startGameButtonObj.setText(R.string.startGameStr);
         }
-
-
     }
 
     public void onAddplayersClick(View button){
-        Intent intent = new Intent(this, NewPlayers.class);
-        startActivity(intent);
-
+        if(!handStarted) {
+            Intent intent = new Intent(this, NewPlayers.class);
+            startActivity(intent);
+        }else {
+            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+            dlgAlert.setMessage("You cannot add new players in the middle of a hand.");
+            dlgAlert.setTitle("Error");
+            dlgAlert.setCancelable(true);
+            dlgAlert.create().show();
+        }
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Bundle extras = data.getExtras();
+        switch(requestCode) {
+            case (Global.START_HAND) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    int handCount = extras.getInt("handCount");
+                    TextView handCountScreenObj = (TextView) findViewById(R.id.handCount);
+                    handCountScreenObj.setText(String.valueOf(handCount));
+
+                    int dealCount = extras.getInt("dealCount");
+                    TextView dealCountScreenObj = (TextView) findViewById(R.id.dealCountText);
+                    dealCountScreenObj.setText(String.valueOf(dealCount));
+                }
+                break;
+            }
+        }
+    }
+
 }

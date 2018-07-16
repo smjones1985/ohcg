@@ -11,14 +11,8 @@ public class Global {
 
     private static ScoreBoardItemAdapter recordAdapter;
 
-    public static boolean isNewGame() {
-        return newGame;
-    }
 
-    public static void setNewGame(boolean newGame) {
-        Global.newGame = newGame;
-    }
-
-    private static boolean newGame;
+    public static final int START_HAND = 0;
+    public static final int END_HAND = 1;
 
 }
