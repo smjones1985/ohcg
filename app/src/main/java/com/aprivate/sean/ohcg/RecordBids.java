@@ -22,6 +22,7 @@ public class RecordBids extends AppCompatActivity {
     private int totalBidsForCurrentHand = 0;
     private int cardsToDealForNewHand;
     private int dealerIndex = -1;
+    private boolean endOfHand;
 
     private List<ScoreBoardItem> scoreBoardItems;
 
@@ -117,31 +118,41 @@ public class RecordBids extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_bids);
+
+        List<ScoreBoardItem> players = loadPlayersAndGetExtras(savedInstanceState);
+        players.stream().forEach(x -> x.setCurrentBid("0"));
+        ScoreBoardItem playerItem = players.get(currentIndex);
+        populateLayoutFields(playerItem);
+    }
+
+    private void populateLayoutFields(ScoreBoardItem playerItem) {
+        TextView dealCountObjectForRecordBids =  (TextView) findViewById(R.id.recordBidsDealCountTextView);
+        dealCountObjectForRecordBids.setText(String.valueOf(cardsToDealForNewHand));
+        TextView playerNameField = (TextView) findViewById(R.id.recordBidPlayerDisplay);
+        playerNameField.setText(playerItem.getPlayerName());
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+    }
+
+    private List<ScoreBoardItem> loadPlayersAndGetExtras(Bundle savedInstanceState) {
         maxIndex = Global.getRecordAdapter().getCount() - 1;
         List<ScoreBoardItem> players = Global.getRecordAdapter().getScoreBoardItems();
         Bundle extras = null;
         if (savedInstanceState == null) {
             extras = getIntent().getExtras();
         }
+        endOfHand = extras.getBoolean("endOfHand");
+        if(!endOfHand) {
+            if (!extras.getBoolean("newGame")) {
+                handCount = Integer.valueOf(extras.getString("handCount")) + 1;
+                cardsToDealForNewHand = Calculate.CalculateWithEstablishedCardsDealt(maxIndex + 1, handCount);
 
-        if(!extras.getBoolean("newGame")) {
-            handCount = Integer.valueOf(extras.getString("handCount")) + 1;
-            cardsToDealForNewHand = Calculate.CalculateWithEstablishedCardsDealt(maxIndex + 1, handCount);
-
-        }else{
-            handCount = 1;
-            cardsToDealForNewHand = Calculate.CalculateFirstHand(maxIndex + 1);
+            } else {
+                handCount = 1;
+                cardsToDealForNewHand = Calculate.CalculateFirstHand(maxIndex + 1);
+            }
         }
-        TextView dealCountObjectForRecordBids =  (TextView) findViewById(R.id.recordBidsDealCountTextView);
-        dealCountObjectForRecordBids.setText(String.valueOf(cardsToDealForNewHand));
-
-        players.stream().forEach(x -> x.setCurrentBid("0"));
-
-        ScoreBoardItem playerItem = players.get(currentIndex);
-        TextView playerNameField = (TextView) findViewById(R.id.recordBidPlayerDisplay);
-        playerNameField.setText(playerItem.getPlayerName());
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        return players;
     }
 
 

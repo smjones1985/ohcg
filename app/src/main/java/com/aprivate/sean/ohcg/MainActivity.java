@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, EndOfHand.class);
             intent.putExtra("handCount", handCount);
             intent.putExtra("newGame", gameStarted);
+            intent.putExtra("endHand", true);
             startActivityForResult(intent, Global.END_HAND);
         }else {
             handStarted = false;
@@ -65,10 +66,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, RecordBids.class);
             intent.putExtra("handCount", handCount);
             intent.putExtra("newGame", gameStarted);
+            intent.putExtra("endHand", false);
             startActivityForResult(intent, Global.START_HAND);
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -144,6 +145,11 @@ public class MainActivity extends AppCompatActivity {
                     dealCountScreenObj.setText(String.valueOf(dealCount));
                 }
                 break;
+            }
+            case (Global.END_HAND) :{
+                if(resultCode == Activity.RESULT_OK){
+
+                }
             }
         }
     }
