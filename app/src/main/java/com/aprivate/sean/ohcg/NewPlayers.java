@@ -26,28 +26,6 @@ public class NewPlayers extends AppCompatActivity {
         finishedAddingButtonObj.setOnClickListener((view) -> {
             onFinished(finishedAddingButtonObj);
         });
-
-        ScoreBoardItem newPlayer = new ScoreBoardItem();
-        newPlayer.setCurrentBid("0");
-        newPlayer.setBoardRank("0");
-        newPlayer.setCurrentPoints("0");
-        newPlayer.setPlayerName("a");
-        Global.getRecordAdapter().add(newPlayer);
-
-        ScoreBoardItem newPlayer2 = new ScoreBoardItem();
-        newPlayer2.setCurrentBid("0");
-        newPlayer2.setBoardRank("0");
-        newPlayer2.setCurrentPoints("0");
-        newPlayer2.setPlayerName("b");
-        Global.getRecordAdapter().add(newPlayer2);
-
-        ScoreBoardItem newPlaye3 = new ScoreBoardItem();
-        newPlaye3.setCurrentBid("0");
-        newPlaye3.setBoardRank("0");
-        newPlaye3.setCurrentPoints("0");
-        newPlaye3.setPlayerName("c");
-        Global.getRecordAdapter().add(newPlaye3);
-
     }
 
     private void onFinished(Button finishedAddingButtonObj) {

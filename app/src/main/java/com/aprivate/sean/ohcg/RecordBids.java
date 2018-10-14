@@ -7,6 +7,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,7 +23,7 @@ public class RecordBids extends AppCompatActivity {
     private int totalBidsForCurrentHand = 0;
     private int cardsToDealForNewHand;
     private int dealerIndex = -1;
-    private boolean endOfHand;
+    private boolean isEndOfHand;
 
     private List<ScoreBoardItem> scoreBoardItems;
 
@@ -32,9 +33,8 @@ public class RecordBids extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             ScoreBoardItem currentPlayer = (ScoreBoardItem) Global.getRecordAdapter().getItem(currentIndex);
-            EditText playerBid = (EditText) findViewById(R.id.bidInputField);
             recordBid(currentPlayer, String.valueOf(playerBid.getText()));
-            CheckBox dealerBox = (CheckBox) findViewById(R.id.dealerCheckBox);
+
             if(dealerBox.isChecked()){
                 dealerIndex = currentIndex;
             }
@@ -60,7 +60,6 @@ public class RecordBids extends AppCompatActivity {
             }
 
             ScoreBoardItem playerItem = (ScoreBoardItem) Global.getRecordAdapter().getItem(currentIndex);
-            TextView playerNameField = (TextView) findViewById(R.id.recordBidPlayerDisplay);
             playerBid.setText(playerItem.getCurrentBid());
             playerNameField.setText(playerItem.getPlayerName());
             if(currentIndex == dealerIndex){
@@ -71,6 +70,14 @@ public class RecordBids extends AppCompatActivity {
             return true;
         }
     };
+    private TextView dealCountObjectForRecordBids;
+    private TextView playerNameField;
+    private EditText playerBid;
+    private BottomNavigationView navigation;
+    private TextView tricksOutLabel;
+    private TextView tricksOutField;
+    private TextView bidLabel;
+    private CheckBox dealerBox;
 
     @Override
     public void onBackPressed(){
@@ -109,8 +116,7 @@ public class RecordBids extends AppCompatActivity {
     private void recordBid(ScoreBoardItem currentPlayer, String bid) {
         currentPlayer.setCurrentBid(bid);
         totalBidsForCurrentHand += Integer.valueOf(bid);
-        TextView tricksOut = (TextView) findViewById(R.id.tricksOutValueText);
-        tricksOut.setText(String.valueOf(totalBidsForCurrentHand));
+        tricksOutField.setText(String.valueOf(totalBidsForCurrentHand));
         Global.getRecordAdapter().update(currentPlayer, currentIndex);
     }
 
@@ -118,19 +124,48 @@ public class RecordBids extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_bids);
+        initializeScreenObjects();
 
         List<ScoreBoardItem> players = loadPlayersAndGetExtras(savedInstanceState);
-        players.stream().forEach(x -> x.setCurrentBid("0"));
+        if(!isEndOfHand){
+            players.stream().forEach(x -> x.setCurrentBid("0"));
+        }
         ScoreBoardItem playerItem = players.get(currentIndex);
+        updateLabels();
         populateLayoutFields(playerItem);
     }
 
+    private void initializeScreenObjects() {
+        dealCountObjectForRecordBids =  findViewById(R.id.recordBidsDealCountTextView);
+        navigation = findViewById(R.id.navigation);
+        playerBid = findViewById(R.id.bidInputField);
+        playerNameField = findViewById(R.id.recordBidPlayerDisplay);
+        tricksOutLabel = findViewById(R.id.tricksOutLabel);
+        bidLabel = findViewById(R.id.bidLabel);
+        tricksOutField = findViewById(R.id.tricksOutValueText);
+        dealerBox = findViewById(R.id.dealerCheckBox);
+    }
+
+    private void updateLabels() {
+        String title = isEndOfHand ? "End of Hand" : "Record Bids";
+        String bidLabelContent = isEndOfHand ? "Tricks:" : "Bid:";
+        if(isEndOfHand){
+            tricksOutField.setActivated(false);
+            tricksOutLabel.setActivated(false);
+        } else{
+            tricksOutField.setActivated(true);
+            tricksOutLabel.setActivated(true);
+        }
+        this.setTitle(title);
+        bidLabel.setText(bidLabelContent);
+
+
+    }
+
     private void populateLayoutFields(ScoreBoardItem playerItem) {
-        TextView dealCountObjectForRecordBids =  (TextView) findViewById(R.id.recordBidsDealCountTextView);
         dealCountObjectForRecordBids.setText(String.valueOf(cardsToDealForNewHand));
-        TextView playerNameField = (TextView) findViewById(R.id.recordBidPlayerDisplay);
         playerNameField.setText(playerItem.getPlayerName());
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        playerBid.setText(String.valueOf(playerItem.getCurrentBid()));
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
@@ -141,8 +176,8 @@ public class RecordBids extends AppCompatActivity {
         if (savedInstanceState == null) {
             extras = getIntent().getExtras();
         }
-        endOfHand = extras.getBoolean("endOfHand");
-        if(!endOfHand) {
+        isEndOfHand = extras.getBoolean("isEndOfHand");
+        if(!isEndOfHand) {
             if (!extras.getBoolean("newGame")) {
                 handCount = Integer.valueOf(extras.getString("handCount")) + 1;
                 cardsToDealForNewHand = Calculate.CalculateWithEstablishedCardsDealt(maxIndex + 1, handCount);
@@ -151,7 +186,11 @@ public class RecordBids extends AppCompatActivity {
                 handCount = 1;
                 cardsToDealForNewHand = Calculate.CalculateFirstHand(maxIndex + 1);
             }
+        }else{
+            handCount = Integer.valueOf(extras.getString("handCount"));
         }
+
+
         return players;
     }
 
