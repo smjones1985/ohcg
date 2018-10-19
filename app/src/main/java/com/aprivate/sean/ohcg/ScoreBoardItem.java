@@ -1,5 +1,8 @@
 package com.aprivate.sean.ohcg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ScoreBoardItem {
     private String playerName;
 
@@ -37,5 +40,24 @@ public class ScoreBoardItem {
 
     private String currentBid;
     private String currentPoints;
+
+    public int getCurrentTricksTaken() {
+        return currentTricksTaken;
+    }
+
+    public void setCurrentTricksTaken(int currentTricksTaken) {
+        this.currentTricksTaken = currentTricksTaken;
+    }
+
+    private int currentTricksTaken;
     private String boardRank;
+
+    public List<RecordedHand> getRecordedHands() {
+        if(recordedHands == null){
+            return new ArrayList<>();
+        }
+        return recordedHands;
+    }
+
+    private List<RecordedHand> recordedHands;
 }

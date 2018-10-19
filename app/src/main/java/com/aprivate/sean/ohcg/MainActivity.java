@@ -53,13 +53,11 @@ public class MainActivity extends AppCompatActivity {
     private void onStartHandClick(Button startEndHandButtonObj) {
         String handCount = ((TextView) findViewById(R.id.handCount)).getText().toString();
         int activityId = 0;
-        if(!handStarted){
-            handStarted = true;
+        if(handStarted){
             startEndHandButtonObj.setText(R.string.endHandStr);
             activityId = Global.END_HAND;
 
         }else {
-            handStarted = false;
             startEndHandButtonObj.setText(R.string.beginHandStr);
             activityId = Global.START_HAND;
 
@@ -138,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         switch(requestCode) {
             case (Global.START_HAND) : {
                 if (resultCode == Activity.RESULT_OK) {
+                    handStarted = true;
                     int handCount = extras.getInt("handCount");
                     TextView handCountScreenObj = (TextView) findViewById(R.id.handCount);
                     handCountScreenObj.setText(String.valueOf(handCount));
@@ -149,9 +148,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             case (Global.END_HAND) :{
-                if(resultCode == Activity.RESULT_OK){
-
-                }
+                handStarted = false;
             }
         }
     }
