@@ -1,9 +1,28 @@
 package com.aprivate.sean.ohcg;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public class ScoreBoardItem {
+    private static Random random = new Random();
+
+    public ScoreBoardItem(){
+        setIdNumber(random.nextInt(Integer.MAX_VALUE));
+    }
+
+    public int getIdNumber() {
+        return idNumber;
+    }
+
+    public void setIdNumber(int idNumber) {
+        this.idNumber = idNumber;
+    }
+
+    private int idNumber;
+
+
     private String playerName;
 
     public String getPlayerName() {
@@ -52,12 +71,19 @@ public class ScoreBoardItem {
     private int currentTricksTaken;
     private String boardRank;
 
-    public List<RecordedHand> getRecordedHands() {
-        if(recordedHands == null){
-            return new ArrayList<>();
+    public HashMap<Integer, RecordedHand> getRecordedHands() {
+        if (recordedHands == null) {
+            return new HashMap<>();
         }
         return recordedHands;
     }
 
-    private List<RecordedHand> recordedHands;
+    private HashMap<Integer, RecordedHand> recordedHands;
+
+    public void recordHand(RecordedHand record) {
+        if (recordedHands == null) {
+            recordedHands = new HashMap<>();
+        }
+        recordedHands.put(record.getHand(), record);
+    }
 }

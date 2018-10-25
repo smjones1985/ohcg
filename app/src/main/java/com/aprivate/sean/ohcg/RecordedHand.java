@@ -1,6 +1,25 @@
 package com.aprivate.sean.ohcg;
 
+import java.util.Random;
+
 public class RecordedHand {
+
+    private static Random random = new Random();
+
+    public RecordedHand(){
+        setIdNumber(random.nextInt(Integer.MAX_VALUE));
+    }
+
+    public int getIdNumber() {
+        return idNumber;
+    }
+
+    public void setIdNumber(int idNumber) {
+        this.idNumber = idNumber;
+    }
+
+    private int idNumber;
+
     private int bid;
 
     public int getHand() {

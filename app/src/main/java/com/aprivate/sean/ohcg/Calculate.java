@@ -12,9 +12,16 @@ public class Calculate {
     public static int calculateWithEstablishedCardsDealt(int playerCount, int handCount){
         int maxPossible = calculateFirstHand(playerCount);
         int handsOneColumn = handCount % 10;
-        if(handsOneColumn == 0){
-            handsOneColumn = 1;
+        boolean movingDown = ((handCount / 10) % 2) == 0;
+
+        if(movingDown){
+            handsOneColumn = 10 - (handsOneColumn - 1);
+        }else{
+            if(handsOneColumn == 0 || handsOneColumn == 1){
+                return 1;
+            }
         }
+
         return handsOneColumn > maxPossible ? maxPossible : handsOneColumn;
     }
 

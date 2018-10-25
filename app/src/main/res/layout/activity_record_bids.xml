@@ -60,7 +60,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Bid"
+        android:text="Bid:"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         app:layout_constraintBottom_toTopOf="@+id/tricksTakenInputField"
         app:layout_constraintEnd_toEndOf="parent"
@@ -103,7 +103,7 @@
 
     <TextView
         android:id="@+id/tricksOutValueText"
-        android:layout_width="70dp"
+        android:layout_width="49dp"
         android:layout_height="37dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -112,37 +112,38 @@
         android:text="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.412"
+        app:layout_constraintHorizontal_bias="0.407"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.043" />
 
     <TextView
         android:id="@+id/recordBidsDealCountLabelTextView"
-        android:layout_width="87dp"
+        android:layout_width="77dp"
         android:layout_height="33dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:text="Cards Dealt:"
-        app:layout_constraintBottom_toTopOf="@+id/recordBidPlayerDisplay"
-        app:layout_constraintEnd_toStartOf="@+id/recordBidsDealCountTextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tricksOutValueText"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.043" />
 
     <TextView
         android:id="@+id/recordBidsDealCountTextView"
-        android:layout_width="77dp"
+        android:layout_width="43dp"
         android:layout_height="31dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:text="0"
-        app:layout_constraintBottom_toTopOf="@+id/recordBidPlayerDisplay"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.911"
-        app:layout_constraintStart_toEndOf="@+id/tricksOutValueText"
+        app:layout_constraintHorizontal_bias="0.384"
+        app:layout_constraintStart_toEndOf="@+id/recordBidsDealCountLabelTextView"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.512" />
+        app:layout_constraintVertical_bias="0.043" />
 
 </android.support.constraint.ConstraintLayout>
