@@ -1,7 +1,7 @@
 package com.aprivate.sean.ohcg;
 
 public class Calculate {
-    public static int CalculateFirstHand(int playerCount){
+    public static int calculateFirstHand(int playerCount){
        int firstHand = 10;
        if(54 / playerCount < 10){
            firstHand = 54 / playerCount;
@@ -9,14 +9,29 @@ public class Calculate {
        return firstHand;
     }
 
-    public static int CalculateWithEstablishedCardsDealt(int playerCount, int handCount){
-        int maxPossible = CalculateFirstHand(playerCount);
+    public static int calculateWithEstablishedCardsDealt(int playerCount, int handCount){
+        int maxPossible = calculateFirstHand(playerCount);
         int handsOneColumn = handCount % 10;
-        if(handsOneColumn == 0){
-            handsOneColumn = 1;
+        boolean movingDown = ((handCount / 10) % 2) == 0;
+
+        if(movingDown){
+            handsOneColumn = 10 - (handsOneColumn - 1);
+        }else{
+            if(handsOneColumn == 0 || handsOneColumn == 1){
+                return 1;
+            }
         }
+
         return handsOneColumn > maxPossible ? maxPossible : handsOneColumn;
     }
+
+    public static int calculatePointsEarned(int bid, int tricksTaken){
+        if(bid != tricksTaken){
+            return tricksTaken - 5;
+        }
+        return tricksTaken + 10;
+    }
+
 
 
 }

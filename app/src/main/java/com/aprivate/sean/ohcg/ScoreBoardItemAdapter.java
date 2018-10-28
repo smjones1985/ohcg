@@ -9,6 +9,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class ScoreBoardItemAdapter extends BaseAdapter {
 
@@ -25,8 +27,13 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void update(ScoreBoardItem updateRecord, int index){
-        scoreBoardItems.set(index, updateRecord);
+    public void update(ScoreBoardItem updateRecord){
+        for (int i = 0; i < scoreBoardItems.size(); i++) {
+            if(scoreBoardItems.get(i).getIdNumber() == updateRecord.getIdNumber()){
+                scoreBoardItems.set(i, updateRecord);
+                break;
+            }
+        }
         notifyDataSetChanged();
     }
 
@@ -70,9 +77,9 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
 
         ScoreBoardItem scoreBoardItem = (ScoreBoardItem) getItem(i);
         holder.Name.setText(scoreBoardItem.getPlayerName());
-        holder.CurrentBid.setText(scoreBoardItem.getCurrentBid());
-        holder.TotalPts.setText(scoreBoardItem.getCurrentPoints());
-        holder.Rank.setText(scoreBoardItem.getBoardRank());
+        holder.CurrentBid.setText(String.valueOf(scoreBoardItem.getCurrentBid()));
+        holder.TotalPts.setText(String.valueOf(scoreBoardItem.getCurrentPoints()));
+        holder.Rank.setText(String.valueOf(scoreBoardItem.getBoardRank()));
         return view;
     }
 

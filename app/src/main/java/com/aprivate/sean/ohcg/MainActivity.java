@@ -3,8 +3,6 @@ package com.aprivate.sean.ohcg;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,8 +16,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private boolean handStarted;
+    private boolean isHandInProgress;
     private boolean gameStarted;
+    private int currentDealer;
 
 
     @Override
@@ -36,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button changePlayersButtonObj = (Button) findViewById(R.id.changePlayersButton);
         changePlayersButtonObj.setOnClickListener((view) -> {
-            onAddplayersClick(changePlayersButtonObj);
+            onAddPlayersClick(changePlayersButtonObj);
         });
 
         Button startEndHandButtonObj = (Button) findViewById(R.id.startEndHandButton);
@@ -48,27 +47,28 @@ public class MainActivity extends AppCompatActivity {
         final ListView recordsView = (ListView) findViewById(R.id.scoreBoardList);
         recordsView.setAdapter(Global.getRecordAdapter());
 
+        currentDealer = -1;
     }
 
     private void onStartHandClick(Button startEndHandButtonObj) {
-        String handCount = ((TextView) findViewById(R.id.handCount)).getText().toString();
-        if(!handStarted){
-            handStarted = true;
-            startEndHandButtonObj.setText(R.string.beginHandStr);
-            Intent intent = new Intent(this, EndOfHand.class);
-            intent.putExtra("handCount", handCount);
-            intent.putExtra("newGame", gameStarted);
-            startActivityForResult(intent, Global.END_HAND);
-        }else {
-            handStarted = false;
-            startEndHandButtonObj.setText(R.string.endHandStr);
-            Intent intent = new Intent(this, RecordBids.class);
-            intent.putExtra("handCount", handCount);
-            intent.putExtra("newGame", gameStarted);
-            startActivityForResult(intent, Global.START_HAND);
+        int handCount = Integer.parseInt(((TextView) findViewById(R.id.handCount)).getText().toString());
+        int activityId;
+        if (isHandInProgress) {
+            activityId = Global.END_HAND;
         }
-    }
+        else {
+            handCount++;
+            activityId = Global.START_HAND;
+        }
+        //whether starting or ending the hand, want to go ahead and use record bids and just alter behavior based on flow.
+        Intent intent = new Intent(this, RecordBids.class);
 
+        intent.putExtra("handCount", handCount);
+        intent.putExtra(getString(R.string.extraKey_isHandInProgress), isHandInProgress);
+        intent.putExtra("currentDealer", currentDealer);
+        startActivityForResult(intent, activityId);
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -115,8 +115,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onAddplayersClick(View button){
-        if(!handStarted) {
+    public void onAddPlayersClick(View button){
+        if(!isHandInProgress) {
             Intent intent = new Intent(this, NewPlayers.class);
             startActivity(intent);
         }else {
@@ -132,20 +132,36 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle extras = data.getExtras();
+        Button startEndHandButton = findViewById(R.id.startEndHandButton);
         switch(requestCode) {
             case (Global.START_HAND) : {
                 if (resultCode == Activity.RESULT_OK) {
-                    int handCount = extras.getInt("handCount");
-                    TextView handCountScreenObj = (TextView) findViewById(R.id.handCount);
-                    handCountScreenObj.setText(String.valueOf(handCount));
-
-                    int dealCount = extras.getInt("dealCount");
-                    TextView dealCountScreenObj = (TextView) findViewById(R.id.dealCountText);
-                    dealCountScreenObj.setText(String.valueOf(dealCount));
+                    isHandInProgress = true;
+                    startEndHandButton.setText(R.string.endHandStr);
                 }
                 break;
             }
+            case (Global.END_HAND) :{
+
+                startEndHandButton.setText(R.string.beginHandStr);
+                isHandInProgress = false;
+                break;
+            }
         }
+
+        Runnable uiElementsUpdate = () -> {
+            int handCount = extras.getInt("handCount");
+            TextView handCountScreenObj = (TextView) findViewById(R.id.handCount);
+            handCountScreenObj.setText(String.valueOf(handCount));
+
+            int dealCount = extras.getInt("dealCount");
+            TextView dealCountScreenObj = (TextView) findViewById(R.id.dealCountTextForMain);
+            dealCountScreenObj.setText(String.valueOf(dealCount));
+
+            currentDealer = extras.getInt("currentDealer");
+        };
+        uiElementsUpdate.run();
+
     }
 
 }
