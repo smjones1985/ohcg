@@ -83,7 +83,7 @@
 
     <Button
         android:id="@+id/startEndHandButton"
-        android:layout_width="110dp"
+        android:layout_width="114dp"
         android:layout_height="53dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
@@ -114,8 +114,8 @@
 
     <TableLayout
         android:id="@+id/scoreBoard"
-        android:layout_width="368dp"
-        android:layout_height="222dp"
+        android:layout_width="0dp"
+        android:layout_height="225dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -129,13 +129,13 @@
 
         <TableRow
             android:id="@+id/player1"
-            android:layout_width="match_parent"
+            android:layout_width="355dp"
             android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="5dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:fontFamily="serif"
                 android:text="Name"
@@ -143,7 +143,7 @@
 
             <TextView
                 android:id="@+id/currentBid"
-                android:layout_width="match_parent"
+                android:layout_width="4dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="serif"
@@ -152,7 +152,7 @@
 
             <TextView
                 android:id="@+id/totalPoints"
-                android:layout_width="match_parent"
+                android:layout_width="1dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="serif"
@@ -161,7 +161,7 @@
 
             <TextView
                 android:id="@+id/rank"
-                android:layout_width="match_parent"
+                android:layout_width="9dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="serif"
@@ -173,14 +173,14 @@
 
     <ListView
         android:id="@+id/scoreBoardList"
-        android:layout_width="384dp"
-        android:layout_height="199dp"
+        android:layout_width="0dp"
+        android:layout_height="185dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/startEndGameButton"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/scoreBoard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/scoreBoard"
-        app:layout_constraintVertical_bias="0.235" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
