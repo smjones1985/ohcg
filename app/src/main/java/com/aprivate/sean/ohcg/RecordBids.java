@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -95,8 +96,8 @@ public class RecordBids extends AppCompatActivity {
         recordedHand.setHand(handCount);
         recordedHand.setTricksTaken(Integer.valueOf(tricksTaken));
         recordedHands.put(currentPlayer.getIdNumber(), recordedHand);
-        tricksOutField.setText(String.valueOf( getTotalTricksTaken()));
         currentPlayer.setCurrentTricksTaken(recordedHand.getTricksTaken());
+        tricksOutField.setText(String.valueOf( getTotalTricksTaken()));
         Global.getRecordAdapter().update(currentPlayer);
     }
 
@@ -106,13 +107,6 @@ public class RecordBids extends AppCompatActivity {
             totalTricksTaken += player.getCurrentTricksTaken();
         }
 
-        if(totalTricksTaken == cardsToDealForNewHand) {
-            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-            dlgAlert.setMessage("Tricks taken cannot equal the cards dealt.");
-            dlgAlert.setTitle("Error");
-            dlgAlert.setCancelable(true);
-            dlgAlert.create().show();
-        }
         return totalTricksTaken;
     }
 
@@ -152,6 +146,7 @@ public class RecordBids extends AppCompatActivity {
 
             for (ScoreBoardItem player: players
                  ) {
+
                 boolean result = recordTricksFinal(player);
                 if(!result){
                     AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
@@ -162,6 +157,8 @@ public class RecordBids extends AppCompatActivity {
                     return;
                 }
             }
+            establishRankings();
+
         }
 
         Intent output = new Intent();
@@ -173,15 +170,23 @@ public class RecordBids extends AppCompatActivity {
 
     }
 
+    public void establishRankings() {
+        Collections.sort(players, (player1, player2) -> player1.getCurrentPoints() < player2.getCurrentPoints() ? 1 : player1.getCurrentPoints() == player2.getCurrentPoints() ? 0 : -1);
+        int rank = 1;
+        for (ScoreBoardItem player : players){
+            player.setBoardRank(rank++);
+        }
+    }
+
     private boolean recordTricksFinal(ScoreBoardItem currentPlayer) {
         RecordedHand recordedHand = recordedHands.getOrDefault(currentPlayer.getIdNumber(), null);
         if(recordedHand == null){
             return false;
         }
-        int currentPoints = Integer.parseInt(currentPlayer.getCurrentPoints());
+        int currentPoints = currentPlayer.getCurrentPoints();
         int pointChange = Calculate.calculatePointsEarned(recordedHand.getBid(), recordedHand.getTricksTaken());
         currentPoints += pointChange;
-        currentPlayer.setCurrentPoints(String.valueOf(currentPoints));
+        currentPlayer.setCurrentPoints(currentPoints);
         recordedHand.setPointsAtEndOfHand(currentPoints);
         currentPlayer.recordHand(recordedHand);
         Global.getRecordAdapter().update(currentPlayer);
@@ -266,19 +271,10 @@ public class RecordBids extends AppCompatActivity {
             extras = getIntent().getExtras();
         }
         isEndOfHand = extras.getBoolean(getString(R.string.extraKey_isHandInProgress));
-        handCount = Integer.valueOf(extras.getString("handCount"));
+        handCount = extras.getInt("handCount");
+        cardsToDealForNewHand = Calculate.calculateWithEstablishedCardsDealt(players.size(), handCount);
 
-        if(!isEndOfHand) {
-            if (!extras.getBoolean("newGame")) {
-                handCount += 1;
-                cardsToDealForNewHand = Calculate.calculateWithEstablishedCardsDealt(players.size(), handCount);
-
-            } else {
-                handCount = 1;
-                cardsToDealForNewHand = Calculate.calculateFirstHand(players.size());
-            }
-        }else{
-            cardsToDealForNewHand = Calculate.calculateWithEstablishedCardsDealt(players.size(), handCount);
+        if(isEndOfHand) {
             dealerId = extras.getInt("currentDealer");
         }
     }

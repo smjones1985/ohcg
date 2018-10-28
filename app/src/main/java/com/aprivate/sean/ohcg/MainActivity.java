@@ -51,12 +51,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onStartHandClick(Button startEndHandButtonObj) {
-        String handCount = ((TextView) findViewById(R.id.handCount)).getText().toString();
-        int activityId = isHandInProgress ? Global.END_HAND : Global.START_HAND;
+        int handCount = Integer.parseInt(((TextView) findViewById(R.id.handCount)).getText().toString());
+        int activityId;
+        if (isHandInProgress) {
+            activityId = Global.END_HAND;
+        }
+        else {
+            handCount++;
+            activityId = Global.START_HAND;
+        }
         //whether starting or ending the hand, want to go ahead and use record bids and just alter behavior based on flow.
         Intent intent = new Intent(this, RecordBids.class);
+
         intent.putExtra("handCount", handCount);
-        intent.putExtra("newGame", gameStarted);
         intent.putExtra(getString(R.string.extraKey_isHandInProgress), isHandInProgress);
         intent.putExtra("currentDealer", currentDealer);
         startActivityForResult(intent, activityId);

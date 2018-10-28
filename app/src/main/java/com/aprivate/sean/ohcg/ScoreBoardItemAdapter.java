@@ -77,9 +77,9 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
 
         ScoreBoardItem scoreBoardItem = (ScoreBoardItem) getItem(i);
         holder.Name.setText(scoreBoardItem.getPlayerName());
-        holder.CurrentBid.setText(scoreBoardItem.getCurrentBid());
-        holder.TotalPts.setText(scoreBoardItem.getCurrentPoints());
-        holder.Rank.setText(scoreBoardItem.getBoardRank());
+        holder.CurrentBid.setText(String.valueOf(scoreBoardItem.getCurrentBid()));
+        holder.TotalPts.setText(String.valueOf(scoreBoardItem.getCurrentPoints()));
+        holder.Rank.setText(String.valueOf(scoreBoardItem.getBoardRank()));
         return view;
     }
 

@@ -37,8 +37,8 @@ public class NewPlayers extends AppCompatActivity {
         String name = playerNameTextBox.getText().toString();
         ScoreBoardItem newPlayer = new ScoreBoardItem();
         newPlayer.setCurrentBid("0");
-        newPlayer.setBoardRank("0");
-        newPlayer.setCurrentPoints("0");
+        newPlayer.setBoardRank(0);
+        newPlayer.setCurrentPoints(0);
         newPlayer.setPlayerName(name);
         Global.getRecordAdapter().add(newPlayer);
         TextView playerAddedLabelObj = (TextView) findViewById(R.id.playerAddedLabel);

@@ -1,8 +1,6 @@
 package com.aprivate.sean.ohcg;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 public class ScoreBoardItem {
@@ -41,24 +39,24 @@ public class ScoreBoardItem {
         this.currentBid = currentBid;
     }
 
-    public String getCurrentPoints() {
+    public int getCurrentPoints() {
         return currentPoints;
     }
 
-    public void setCurrentPoints(String currentPoints) {
+    public void setCurrentPoints(int currentPoints) {
         this.currentPoints = currentPoints;
     }
 
-    public String getBoardRank() {
+    public int getBoardRank() {
         return boardRank;
     }
 
-    public void setBoardRank(String boardRank) {
+    public void setBoardRank(int boardRank) {
         this.boardRank = boardRank;
     }
 
     private String currentBid;
-    private String currentPoints;
+    private int currentPoints;
 
     public int getCurrentTricksTaken() {
         return currentTricksTaken;
@@ -69,7 +67,7 @@ public class ScoreBoardItem {
     }
 
     private int currentTricksTaken;
-    private String boardRank;
+    private int boardRank;
 
     public HashMap<Integer, RecordedHand> getRecordedHands() {
         if (recordedHands == null) {
@@ -86,4 +84,7 @@ public class ScoreBoardItem {
         }
         recordedHands.put(record.getHand(), record);
     }
+
+
+
 }
