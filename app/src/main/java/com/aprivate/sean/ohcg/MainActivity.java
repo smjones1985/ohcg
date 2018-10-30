@@ -17,7 +17,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private boolean isHandInProgress;
-    private boolean gameStarted;
     private int currentDealer;
 
 
@@ -28,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Button startGameButtonObj = (Button) findViewById(R.id.startEndGameButton);
+        Button startGameButtonObj = (Button) findViewById(R.id.startGameButton);
         startGameButtonObj.setOnClickListener((view) -> {
             onStartGameClick(startGameButtonObj);
         });
@@ -103,12 +102,10 @@ public class MainActivity extends AppCompatActivity {
                 dlgAlert.setCancelable(true);
                 dlgAlert.create().show();
             } else {
-                gameStarted = true;
                 startGameButtonObj.setText(R.string.endGameStr);
                 onStartHandClick((Button) findViewById(R.id.startEndHandButton));
             }
         }else{
-            gameStarted = false;
             //calculate and display winner
             //store result locally
             startGameButtonObj.setText(R.string.startGameStr);
