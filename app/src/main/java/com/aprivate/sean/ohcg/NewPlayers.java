@@ -33,6 +33,12 @@ public class NewPlayers extends AppCompatActivity {
         onBackPressed();
     }
 
+    @Override
+    public void onBackPressed() {
+
+        super.onBackPressed();
+    }
+
     private void addPlayer(Button addPlayerButtonObj) {
         EditText playerNameTextBox = (EditText) findViewById(R.id.editPlayerName);
         String name = playerNameTextBox.getText().toString();

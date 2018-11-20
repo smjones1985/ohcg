@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ScoreBoardItemAdapter extends BaseAdapter {
@@ -23,6 +24,14 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
     public void add(ScoreBoardItem record) {
         scoreBoardItems.add(record);
         notifyDataSetChanged();
+    }
+
+    public void establishRankings(List<ScoreBoardItem> players) {
+        Collections.sort(players, (player1, player2) -> player1.getCurrentPoints() < player2.getCurrentPoints() ? 1 : player1.getCurrentPoints() == player2.getCurrentPoints() ? 0 : -1);
+        int rank = 1;
+        for (ScoreBoardItem player : players){
+            player.setBoardRank(rank++);
+        }
     }
 
     public void update(ScoreBoardItem updateRecord){
@@ -57,6 +66,10 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         RecordViewHolder holder;
+
+        if(i == 0){
+            establishRankings(scoreBoardItems);
+        }
 
         if (view ==null){
             LayoutInflater recordInflater = (LayoutInflater)

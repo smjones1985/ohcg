@@ -157,8 +157,6 @@ public class RecordBids extends AppCompatActivity {
                     return;
                 }
             }
-            establishRankings();
-
         }
 
         Intent output = new Intent();
@@ -170,13 +168,7 @@ public class RecordBids extends AppCompatActivity {
 
     }
 
-    public void establishRankings() {
-        Collections.sort(players, (player1, player2) -> player1.getCurrentPoints() < player2.getCurrentPoints() ? 1 : player1.getCurrentPoints() == player2.getCurrentPoints() ? 0 : -1);
-        int rank = 1;
-        for (ScoreBoardItem player : players){
-            player.setBoardRank(rank++);
-        }
-    }
+
 
     private boolean recordTricksFinal(ScoreBoardItem currentPlayer) {
         RecordedHand recordedHand = recordedHands.getOrDefault(currentPlayer.getIdNumber(), null);
