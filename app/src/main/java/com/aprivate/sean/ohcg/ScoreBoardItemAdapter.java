@@ -81,6 +81,7 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
             holder.CurrentBid = (TextView) view.findViewById(R.id.currentBid);
             holder.TotalPts = (TextView) view.findViewById(R.id.totalPoints);
             holder.Rank = (TextView) view.findViewById(R.id.rank);
+            holder.Order = view.findViewById(R.id.order);
             view.setTag(holder);
         }else {
             holder = (RecordViewHolder) view.getTag();
@@ -91,6 +92,7 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
         holder.CurrentBid.setText(String.valueOf(scoreBoardItem.getCurrentBid()));
         holder.TotalPts.setText(String.valueOf(scoreBoardItem.getCurrentPoints()));
         holder.Rank.setText(String.valueOf(scoreBoardItem.getBoardRank()));
+        holder.Order.setText(String.valueOf(scoreBoardItem.getOrder()));
         return view;
     }
 
@@ -100,5 +102,6 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
         public TextView CurrentBid;
         public TextView TotalPts;
         public TextView Rank;
+        public TextView Order;
     }
 }

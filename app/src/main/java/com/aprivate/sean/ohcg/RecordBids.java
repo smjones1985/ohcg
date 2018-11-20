@@ -7,6 +7,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -27,7 +28,7 @@ public class RecordBids extends AppCompatActivity {
     private TextView bidLabel;
     private CheckBox dealerBox;
 
-    private int currentIndex = 0;
+    private int currentOrderNumber = 1;
     private int maxIndex = 1;
     private int handCount = 0;
     private int cardsToDealForNewHand;
@@ -35,14 +36,14 @@ public class RecordBids extends AppCompatActivity {
     private boolean isEndOfHand;
     private int totalBidsForCurrentHand;
 
-
+    HashMap<Integer, ScoreBoardItem> playerOrderMapToIndex;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            ScoreBoardItem currentPlayer = (ScoreBoardItem) Global.getRecordAdapter().getItem(currentIndex);
+            ScoreBoardItem currentPlayer = playerOrderMapToIndex.get(currentOrderNumber);
             if(!isEndOfHand) {
                 recordBid(currentPlayer, String.valueOf(playerBid.getText()));
             }else{
@@ -58,22 +59,22 @@ public class RecordBids extends AppCompatActivity {
                     onBackPressed();
                     break;
                 case R.id.navigation_dashboard_previous:
-                    if(currentIndex - 1 < 0){
-                        currentIndex = maxIndex;
+                    if(currentOrderNumber - 1 < 1){
+                        currentOrderNumber = maxIndex;
                     }else{
-                        currentIndex--;
+                        currentOrderNumber--;
                     }
                     break;
                 case R.id.navigation_dashboard_next:
-                    if(currentIndex + 1 > maxIndex){
-                        currentIndex = 0;
+                    if(currentOrderNumber + 1 > maxIndex){
+                        currentOrderNumber = 1;
                     }else{
-                        currentIndex++;
+                        currentOrderNumber++;
                     }
                     break;
             }
 
-            ScoreBoardItem playerItem = (ScoreBoardItem) Global.getRecordAdapter().getItem(currentIndex);
+            ScoreBoardItem playerItem = playerOrderMapToIndex.get(currentOrderNumber);
             if(!isEndOfHand) {
                 playerBid.setText(playerItem.getCurrentBid());
             }else{
@@ -86,6 +87,20 @@ public class RecordBids extends AppCompatActivity {
     };
     private List<ScoreBoardItem> players;
     private HashMap<Integer, RecordedHand> recordedHands;
+    private HashMap<String, Button> buttonHashMap;
+    private Button button0;
+    private Button button1;
+    private Button button2;
+    private Button button3;
+    private Button button4;
+    private Button button5;
+    private Button button6;
+    private Button button7;
+    private Button button8;
+    private Button button9;
+    private Button buttonC;
+
+
 
     private void recordTricks(ScoreBoardItem currentPlayer, String tricksTaken) {
         if(recordedHands == null) {
@@ -207,19 +222,33 @@ public class RecordBids extends AppCompatActivity {
         initializeScreenObjects();
         loadPlayersAndGetExtras(savedInstanceState);
 
-        if(!isEndOfHand){
-            players.stream().forEach(x -> x.setCurrentBid("0"));
-        }else{
+        players.stream().forEach(x -> {
+            if(!isEndOfHand) {
+                x.setCurrentBid("0");
+            }else {
+                x.setCurrentTricksTaken(Integer.parseInt(x.getCurrentBid()));
+                recordTricks(x, x.getCurrentBid());
+            }
 
-            players.stream().forEach(x -> {
-                    x.setCurrentTricksTaken(Integer.parseInt(x.getCurrentBid()));
-                    recordTricks(x, x.getCurrentBid());
-            });
-            totalBidsForCurrentHand = getCurrentBids();
-        }
-        ScoreBoardItem playerItem = players.get(currentIndex);
+            if(playerOrderMapToIndex == null){
+                playerOrderMapToIndex = new HashMap<>();
+            }
+            playerOrderMapToIndex.put(x.getOrder(), x);
+        });
+
+        totalBidsForCurrentHand = getCurrentBids();
+
+        ScoreBoardItem playerItem = getFirstPlayerToBid();
         updateLabels();
         populateLayoutFields(playerItem);
+    }
+
+    private ScoreBoardItem getFirstPlayerToBid() {
+        ScoreBoardItem dealer = dealerId > 0 ? playerOrderMapToIndex.get(dealerId) : null;
+        if(dealer == null || dealer.getOrder() + 1 > players.size()) {
+            return playerOrderMapToIndex.get(1);
+        }
+        return playerOrderMapToIndex.get(dealerId + 1);
     }
 
     private void initializeScreenObjects() {
@@ -231,6 +260,36 @@ public class RecordBids extends AppCompatActivity {
         bidLabel = findViewById(R.id.bidLabel);
         tricksOutField = findViewById(R.id.tricksOutValueText);
         dealerBox = findViewById(R.id.dealerCheckBox);
+        if(buttonHashMap == null){
+            buttonHashMap = new HashMap<>();
+        }
+        buttonHashMap.put("0", findViewById(R.id.button0));
+        buttonHashMap.put("1", findViewById(R.id.button1));
+        buttonHashMap.put("2", findViewById(R.id.button2));
+        buttonHashMap.put("3", findViewById(R.id.button3));
+        buttonHashMap.put("4", findViewById(R.id.button4));
+        buttonHashMap.put("5", findViewById(R.id.button5));
+        buttonHashMap.put("6", findViewById(R.id.button6));
+        buttonHashMap.put("7", findViewById(R.id.button7));
+        buttonHashMap.put("8", findViewById(R.id.button8));
+        buttonHashMap.put("9", findViewById(R.id.button9));
+        buttonHashMap.put("c", findViewById(R.id.buttonC));
+
+        for (Button button : buttonHashMap.values()) {
+            button.setOnClickListener((view) -> {
+                onNumberButtonClick(button);
+            });
+
+        }
+    }
+
+    private void onNumberButtonClick(Button button) {
+        if(button.getText().toString().equalsIgnoreCase("C")){
+            playerBid.setText("0");
+        }else{
+            playerBid.setText(button.getText().toString());
+        }
+
     }
 
     private void updateLabels() {
@@ -256,7 +315,7 @@ public class RecordBids extends AppCompatActivity {
     }
 
     private void loadPlayersAndGetExtras(Bundle savedInstanceState) {
-        maxIndex = Global.getRecordAdapter().getCount() - 1;
+        maxIndex = Global.getRecordAdapter().getCount();
         players = Global.getRecordAdapter().getScoreBoardItems();
         Bundle extras = null;
         if (savedInstanceState == null) {

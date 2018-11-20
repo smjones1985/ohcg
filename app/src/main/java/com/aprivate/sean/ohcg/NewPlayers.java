@@ -48,6 +48,7 @@ public class NewPlayers extends AppCompatActivity {
             newPlayer.setBoardRank(0);
             newPlayer.setCurrentPoints(0);
             newPlayer.setPlayerName(name);
+            newPlayer.setOrder(Global.getRecordAdapter().getCount() + 1);
             Global.getRecordAdapter().add(newPlayer);
             TextView playerAddedLabelObj = (TextView) findViewById(R.id.playerAddedLabel);
             playerAddedLabelObj.setText(name + " has been added!");

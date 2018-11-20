@@ -152,7 +152,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="serif"
-                android:text="CurrentBid"
+                android:text="Bid"
                 android:textColor="#000" />
 
             <TextView
@@ -166,11 +166,19 @@
 
             <TextView
                 android:id="@+id/rank"
-                android:layout_width="9dp"
+                android:layout_width="11dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="serif"
                 android:text="Rank"
+                android:textColor="#000" />
+            <TextView
+                android:id="@+id/order"
+                android:layout_width="11dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="serif"
+                android:text="Order"
                 android:textColor="#000" />
 
         </TableRow>
