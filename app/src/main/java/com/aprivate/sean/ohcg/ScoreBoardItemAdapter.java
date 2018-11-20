@@ -9,17 +9,15 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 public class ScoreBoardItemAdapter extends BaseAdapter {
 
-    private Context scoarBoardContext;
+    private Context scoreBoardContext;
     private List<ScoreBoardItem> scoreBoardItems;
 
     public ScoreBoardItemAdapter(Context context, List<ScoreBoardItem> items) {
         scoreBoardItems = items;
-        scoarBoardContext = context;
+        scoreBoardContext = context;
     }
 
     public void add(ScoreBoardItem record) {
@@ -62,7 +60,7 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
 
         if (view ==null){
             LayoutInflater recordInflater = (LayoutInflater)
-                    scoarBoardContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+                    scoreBoardContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             view = recordInflater.inflate(R.layout.score_board, null);
 
             holder = new RecordViewHolder();
