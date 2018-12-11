@@ -96,6 +96,24 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
         return view;
     }
 
+    public void updateOrderAndPoints(ScoreBoardItem player, int newOrderNumber, int newPoints) {
+        int previousOrder = player.getOrder();
+        for (ScoreBoardItem item : scoreBoardItems) {
+            if(item.getIdNumber() == player.getIdNumber()){
+                item.setOrder(newOrderNumber);
+                item.setCurrentPoints(newPoints);
+            }else if(item.getOrder() < previousOrder && item.getOrder() >= newOrderNumber){
+                item.setOrder(item.getOrder() + 1);
+                update(item);
+            } else if(item.getOrder() > previousOrder && item.getOrder() <= newOrderNumber){
+                item.setOrder(item.getOrder() - 1);
+            }else{
+                continue;
+            }
+            update(item);
+        }
+    }
+
     private static class RecordViewHolder {
 
         public TextView Name;

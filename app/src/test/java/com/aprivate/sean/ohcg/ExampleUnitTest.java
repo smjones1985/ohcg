@@ -126,5 +126,99 @@ public class ExampleUnitTest {
         }
     }
 
+    @Test
+    public void ReorderTesting(){
+        List<ScoreBoardItem> players = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            ScoreBoardItem player = new ScoreBoardItem();
+            player.setOrder(i + 1);
+            players.add(player);
+        }
+        ScoreBoardItemAdapter adapter = new ScoreBoardItemAdapter(null, players);
+        adapter.updateOrderAndPoints(players.get(2), 1, 10);
+        List<ScoreBoardItem> items = adapter.getScoreBoardItems();
+        Collections.sort(items, (player1, player2) -> player1.getOrder() < player2.getOrder() ? -1 : player1.getOrder() == player2.getOrder() ? 0 : 1);
+        int previousOrder = 0;
+        for (int i = 0; i < items.size(); i++) {
+            int orderNumber = items.get(i).getOrder();
+            if(i == 0){
+                assert orderNumber == 1 && items.get(i).getCurrentPoints() == 10;
+            }
 
+            assert orderNumber != previousOrder;
+            previousOrder = orderNumber;
+        }
+    }
+
+    @Test
+    public void ReorderTestin2(){
+        List<ScoreBoardItem> players = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            ScoreBoardItem player = new ScoreBoardItem();
+            player.setOrder(i + 1);
+            players.add(player);
+        }
+        ScoreBoardItemAdapter adapter = new ScoreBoardItemAdapter(null, players);
+        adapter.updateOrderAndPoints(players.get(2), 5, 10);
+        List<ScoreBoardItem> items = adapter.getScoreBoardItems();
+        Collections.sort(items, (player1, player2) -> player1.getOrder() < player2.getOrder() ? -1 : player1.getOrder() == player2.getOrder() ? 0 : 1);
+        int previousOrder = 0;
+        for (int i = 0; i < items.size(); i++) {
+            int orderNumber = items.get(i).getOrder();
+            if(i == 4){
+                assert orderNumber == 5 && items.get(i).getCurrentPoints() == 10;
+            }
+
+            assert orderNumber != previousOrder;
+            previousOrder = orderNumber;
+        }
+    }
+
+    @Test
+    public void ReorderTestin3(){
+        List<ScoreBoardItem> players = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            ScoreBoardItem player = new ScoreBoardItem();
+            player.setOrder(i + 1);
+            players.add(player);
+        }
+        ScoreBoardItemAdapter adapter = new ScoreBoardItemAdapter(null, players);
+        adapter.updateOrderAndPoints(players.get(0), 6, 10);
+        List<ScoreBoardItem> items = adapter.getScoreBoardItems();
+        Collections.sort(items, (player1, player2) -> player1.getOrder() < player2.getOrder() ? -1 : player1.getOrder() == player2.getOrder() ? 0 : 1);
+        int previousOrder = 0;
+        for (int i = 0; i < items.size(); i++) {
+            int orderNumber = items.get(i).getOrder();
+            if(i == 5){
+                assert orderNumber == 6 && items.get(i).getCurrentPoints() == 10;
+            }
+
+            assert orderNumber != previousOrder;
+            previousOrder = orderNumber;
+        }
+    }
+
+    @Test
+    public void ReorderTestin4(){
+        List<ScoreBoardItem> players = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            ScoreBoardItem player = new ScoreBoardItem();
+            player.setOrder(i + 1);
+            players.add(player);
+        }
+        ScoreBoardItemAdapter adapter = new ScoreBoardItemAdapter(null, players);
+        adapter.updateOrderAndPoints(players.get(5), 1, 10);
+        List<ScoreBoardItem> items = adapter.getScoreBoardItems();
+        Collections.sort(items, (player1, player2) -> player1.getOrder() < player2.getOrder() ? -1 : player1.getOrder() == player2.getOrder() ? 0 : 1);
+        int previousOrder = 0;
+        for (int i = 0; i < items.size(); i++) {
+            int orderNumber = items.get(i).getOrder();
+            if(i == 0){
+                assert orderNumber == 1 && items.get(i).getCurrentPoints() == 10;
+            }
+
+            assert orderNumber != previousOrder;
+            previousOrder = orderNumber;
+        }
+    }
 }

@@ -25,7 +25,8 @@
         <activity
             android:name=".RecordBids"
             android:label="@string/title_activity_record_bids" />
-        <activity android:name=".EndOfHand"></activity>
+        <activity android:name=".EndOfHand" />
+        <activity android:name=".EditPlayer"></activity>
     </application>
 
 </manifest>

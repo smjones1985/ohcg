@@ -9,16 +9,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private boolean isHandInProgress;
-    private int currentDealer;
 
+    private GameState gameState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,29 +43,44 @@ public class MainActivity extends AppCompatActivity {
             onStartHandClick(startEndHandButtonObj);
         });
 
-        Global.setRecordAdapter(new ScoreBoardItemAdapter(this, new ArrayList<ScoreBoardItem>()));
-        final ListView recordsView = (ListView) findViewById(R.id.scoreBoardList);
-        recordsView.setAdapter(Global.getRecordAdapter());
+        Button editHandButtonObj = (Button) findViewById(R.id.editHandButton);
+        editHandButtonObj.setOnClickListener((view) -> {
+            onEditHandClick(editHandButtonObj);
+        });
+        gameState = new GameState();
 
-        currentDealer = -1;
+        gameState.setRecordAdapter(new ScoreBoardItemAdapter(this, new ArrayList<ScoreBoardItem>()));
+        final ListView recordsView = (ListView) findViewById(R.id.scoreBoardList);
+        recordsView.setAdapter(gameState.getRecordAdapter());
+        recordsView.setItemsCanFocus(true);
+        recordsView.setOnItemClickListener((adapterView, view, i, l) -> {
+            Intent intent = new Intent(MainActivity.this, EditPlayer.class);
+            intent.putExtra("player", i);
+            startActivityForResult(intent, 1);
+        });
+        gameState.setCurrentDealer(-1);
+    }
+
+    private void onEditHandClick(Button editHandButtonObj) {
+        gameState.setEditOfHand(true);
+        //whether starting or ending the hand, want to go ahead and use record bids and just alter behavior based on flow.
+        Intent intent = new Intent(this, RecordBids.class);
+        intent.putExtra("gameState", gameState);
+        startActivityForResult(intent, Global.EDIT_HAND);
     }
 
     private void onStartHandClick(Button startEndHandButtonObj) {
-        int handCount = Integer.parseInt(((TextView) findViewById(R.id.handCount)).getText().toString());
         int activityId;
-        if (isHandInProgress) {
+        if (gameState.isHandInProgress()) {
             activityId = Global.END_HAND;
         }
         else {
-            handCount++;
+            gameState.setHandCount(gameState.getHandCount() + 1);
             activityId = Global.START_HAND;
         }
         //whether starting or ending the hand, want to go ahead and use record bids and just alter behavior based on flow.
         Intent intent = new Intent(this, RecordBids.class);
-
-        intent.putExtra("handCount", handCount);
-        intent.putExtra(getString(R.string.extraKey_isHandInProgress), isHandInProgress);
-        intent.putExtra("currentDealer", currentDealer);
+        intent.putExtra("gameState", gameState);
         startActivityForResult(intent, activityId);
 
     }
@@ -93,8 +109,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void onStartGameClick(View button){
         Button startGameButtonObj = (Button) button;
-        if(!startGameButtonObj.getText().toString().equalsIgnoreCase(getString(R.string.endGameStr))) {
-            int recordCount = Global.getRecordAdapter().getCount();
+
+        if(!gameState.isGameInProgress()) {
+            gameState.setGameInProgress(true);
+            int recordCount = gameState.getRecordAdapter().getCount();
             if (recordCount < 2) {
                 AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
                 dlgAlert.setMessage("You must have at least two players");
@@ -103,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 dlgAlert.create().show();
             } else {
                 startGameButtonObj.setText(R.string.endGameStr);
-                onStartHandClick((Button) findViewById(R.id.startEndHandButton));
+                onStartHandClick(findViewById(R.id.startEndHandButton));
             }
         }else{
             //calculate and display winner
@@ -113,49 +131,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onAddPlayersClick(View button){
-        if(!isHandInProgress) {
-            Intent intent = new Intent(this, NewPlayers.class);
-            startActivity(intent);
-        }else {
-            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-            dlgAlert.setMessage("You cannot add new players in the middle of a hand.");
-            dlgAlert.setTitle("Error");
-            dlgAlert.setCancelable(true);
-            dlgAlert.create().show();
-        }
+        Intent intent = new Intent(this, NewPlayers.class);
+        startActivity(intent);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle extras = data.getExtras();
+        Serializable retrievedState = extras.getSerializable("gameState");
+
+        if(retrievedState != null){
+            gameState = (GameState)retrievedState;
+        }
         Button startEndHandButton = findViewById(R.id.startEndHandButton);
+        Button editHandButton = findViewById(R.id.editHandButton);
+
         switch(requestCode) {
             case (Global.START_HAND) : {
                 if (resultCode == Activity.RESULT_OK) {
-                    isHandInProgress = true;
+                    gameState.setHandInProgress(true);
                     startEndHandButton.setText(R.string.endHandStr);
+                    editHandButton.setVisibility(View.VISIBLE);
                 }
                 break;
             }
             case (Global.END_HAND) :{
-
                 startEndHandButton.setText(R.string.beginHandStr);
-                isHandInProgress = false;
+                gameState.setHandInProgress(false);
+                editHandButton.setVisibility(View.INVISIBLE);
                 break;
             }
         }
 
         Runnable uiElementsUpdate = () -> {
-            int handCount = extras.getInt("handCount");
             TextView handCountScreenObj = (TextView) findViewById(R.id.handCount);
-            handCountScreenObj.setText(String.valueOf(handCount));
+            handCountScreenObj.setText(String.valueOf(gameState.getHandCount()));
 
-            int dealCount = extras.getInt("dealCount");
             TextView dealCountScreenObj = (TextView) findViewById(R.id.dealCountTextForMain);
-            dealCountScreenObj.setText(String.valueOf(dealCount));
+            dealCountScreenObj.setText(String.valueOf(gameState.getDealCount()));
 
-            currentDealer = extras.getInt("currentDealer");
         };
         uiElementsUpdate.run();
 

@@ -42,7 +42,7 @@ public class NewPlayers extends AppCompatActivity {
     private void addPlayer(Button addPlayerButtonObj) {
         EditText playerNameTextBox = (EditText) findViewById(R.id.editPlayerName);
         String name = playerNameTextBox.getText().toString();
-        if(name != null && name != "" && !Global.getRecordAdapter().getScoreBoardItems().stream().anyMatch(x -> x.getPlayerName().equalsIgnoreCase(name))) {
+        if(name != null && !name.equalsIgnoreCase("") && !Global.getRecordAdapter().getScoreBoardItems().stream().anyMatch(x -> x.getPlayerName().equalsIgnoreCase(name))) {
             ScoreBoardItem newPlayer = new ScoreBoardItem();
             newPlayer.setCurrentBid("0");
             newPlayer.setBoardRank(0);

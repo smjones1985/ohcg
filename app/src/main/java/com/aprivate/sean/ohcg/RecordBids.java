@@ -34,6 +34,7 @@ public class RecordBids extends AppCompatActivity {
     private int cardsToDealForNewHand;
     private int dealerId = -1;
     private boolean isEndOfHand;
+    private boolean isEditHand;
     private int totalBidsForCurrentHand;
 
     HashMap<Integer, ScoreBoardItem> playerOrderMapToIndex;
@@ -44,7 +45,7 @@ public class RecordBids extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             ScoreBoardItem currentPlayer = playerOrderMapToIndex.get(currentOrderNumber);
-            if(!isEndOfHand) {
+            if(!isEndOfHand || isEditHand) {
                 recordBid(currentPlayer, String.valueOf(playerBid.getText()));
             }else{
                 recordTricks(currentPlayer, String.valueOf(playerBid.getText()));
@@ -75,7 +76,7 @@ public class RecordBids extends AppCompatActivity {
             }
 
             ScoreBoardItem playerItem = playerOrderMapToIndex.get(currentOrderNumber);
-            if(!isEndOfHand) {
+            if(!isEndOfHand || isEditHand) {
                 playerBid.setText(playerItem.getCurrentBid());
             }else{
                 playerBid.setText(String.valueOf(playerItem.getCurrentTricksTaken()));
@@ -88,17 +89,6 @@ public class RecordBids extends AppCompatActivity {
     private List<ScoreBoardItem> players;
     private HashMap<Integer, RecordedHand> recordedHands;
     private HashMap<String, Button> buttonHashMap;
-    private Button button0;
-    private Button button1;
-    private Button button2;
-    private Button button3;
-    private Button button4;
-    private Button button5;
-    private Button button6;
-    private Button button7;
-    private Button button8;
-    private Button button9;
-    private Button buttonC;
 
 
 
@@ -128,22 +118,14 @@ public class RecordBids extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        if(!isEndOfHand) {
+        if(!isEndOfHand || isEditHand) {
             if (dealerId < 0) {
-                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-                dlgAlert.setMessage("A dealer must be set");
-                dlgAlert.setTitle("Error");
-                dlgAlert.setCancelable(true);
-                dlgAlert.create().show();
+                showAlert("A dealer must be set", "Error");
                 return;
 
             } else if (totalBidsForCurrentHand == cardsToDealForNewHand) {
-                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
                 ScoreBoardItem dealer = (ScoreBoardItem) Global.getRecordAdapter().getItem(dealerId);
-                dlgAlert.setMessage(String.format("%s cannot bid %s. Please, change bid.", dealer.getPlayerName(), dealer.getCurrentBid()));
-                dlgAlert.setTitle("Error");
-                dlgAlert.setCancelable(true);
-                dlgAlert.create().show();
+                showAlert(String.format("%s cannot bid %s. Please, change bid.", dealer.getPlayerName(), dealer.getCurrentBid()), "Error");
                 return;
 
             }
@@ -151,11 +133,7 @@ public class RecordBids extends AppCompatActivity {
 
             int totalTricksTaken = players.stream().mapToInt(ScoreBoardItem::getCurrentTricksTaken).sum();
             if(cardsToDealForNewHand != totalTricksTaken){
-                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-                dlgAlert.setMessage("Tricks taken cannot equal the number of tricks bid");
-                dlgAlert.setTitle("Error");
-                dlgAlert.setCancelable(true);
-                dlgAlert.create().show();
+                showAlert("Tricks taken cannot equal the number of tricks bid", "Error");
                 return;
             }
 
@@ -164,11 +142,7 @@ public class RecordBids extends AppCompatActivity {
 
                 boolean result = recordTricksFinal(player);
                 if(!result){
-                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-                    dlgAlert.setMessage("Error recording tricks for " + player.getPlayerName());
-                    dlgAlert.setTitle("Error");
-                    dlgAlert.setCancelable(true);
-                    dlgAlert.create().show();
+                    showAlert("Error recording tricks for " + player.getPlayerName(), "Error");
                     return;
                 }
             }
@@ -183,6 +157,13 @@ public class RecordBids extends AppCompatActivity {
 
     }
 
+    private void showAlert(String message, String title) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+        dlgAlert.setMessage(message);
+        dlgAlert.setTitle(title);
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
+    }
 
 
     private boolean recordTricksFinal(ScoreBoardItem currentPlayer) {
@@ -223,9 +204,9 @@ public class RecordBids extends AppCompatActivity {
         loadPlayersAndGetExtras(savedInstanceState);
 
         players.stream().forEach(x -> {
-            if(!isEndOfHand) {
+            if(!isEndOfHand && !isEditHand) {
                 x.setCurrentBid("0");
-            }else {
+            } else if(!isEditHand){
                 x.setCurrentTricksTaken(Integer.parseInt(x.getCurrentBid()));
                 recordTricks(x, x.getCurrentBid());
             }
@@ -293,9 +274,9 @@ public class RecordBids extends AppCompatActivity {
     }
 
     private void updateLabels() {
-        String title = isEndOfHand ? "End of Hand" : "Record Bids";
-        String bidLabelContent = isEndOfHand ? "Tricks:" : "Bid:";
-        if(isEndOfHand){
+        String title = isEndOfHand && !isEditHand? "End of Hand" : "Record Bids";
+        String bidLabelContent = isEndOfHand && !isEditHand? "Tricks:" : "Bid:";
+        if(isEndOfHand && !isEditHand){
             tricksOutLabel.setText("Tricks Taken:");
         } else{
             tricksOutLabel.setText("Tricks Out:");
@@ -322,9 +303,14 @@ public class RecordBids extends AppCompatActivity {
             extras = getIntent().getExtras();
         }
         isEndOfHand = extras.getBoolean(getString(R.string.extraKey_isHandInProgress));
+        isEditHand = extras.getBoolean(getString(R.string.extraKey_editHand));
         handCount = extras.getInt("handCount");
         cardsToDealForNewHand = Calculate.calculateWithEstablishedCardsDealt(players.size(), handCount);
-
+        if(cardsToDealForNewHand * players.size() == 54){
+            showAlert("Jokers are in! Deal them all!", "Notification");
+        }else{
+            showAlert("Deal " + cardsToDealForNewHand, "Notification");
+        }
         if(isEndOfHand) {
             dealerId = extras.getInt("currentDealer");
         }
