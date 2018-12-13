@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.Collections;
 import java.util.List;
 
-public class ScoreBoardItemAdapter extends BaseAdapter {
+public class ScoreBoardItemAdapter  extends BaseAdapter {
 
     private Context scoreBoardContext;
     private List<ScoreBoardItem> scoreBoardItems;
@@ -48,6 +48,7 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
     public int getCount() {
         return scoreBoardItems.size();
     }
+
     @Override
     public Object getItem(int i) {
         return scoreBoardItems.get(i);
@@ -112,6 +113,15 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
             }
             update(item);
         }
+    }
+
+    public ScoreBoardItem getById(int currentDealer) {
+        for (ScoreBoardItem item : scoreBoardItems) {
+            if(item.getIdNumber() == currentDealer) {
+                return item;
+            }
+        }
+        return null;
     }
 
     private static class RecordViewHolder {

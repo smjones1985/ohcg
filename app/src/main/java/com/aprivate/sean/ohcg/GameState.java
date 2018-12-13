@@ -3,8 +3,22 @@ package com.aprivate.sean.ohcg;
 import java.io.Serializable;
 
 public class GameState implements Serializable {
+
+    public GameState(){
+        setHandState(HandState.BeginningOfHand);
+    }
     private boolean gameInProgress;
     private int handCount;
+
+    public HandState getHandState() {
+        return handState;
+    }
+
+    public void setHandState(HandState handState) {
+        this.handState = handState;
+    }
+
+    private HandState handState;
 
     public boolean isGameInProgress() {
         return gameInProgress;
@@ -14,25 +28,7 @@ public class GameState implements Serializable {
         this.gameInProgress = gameInProgress;
     }
 
-    public boolean isEditOfHand() {
-        return editOfHand;
-    }
 
-    public void setEditOfHand(boolean editOfHand) {
-        this.editOfHand = editOfHand;
-    }
-
-    private boolean editOfHand;
-
-    public boolean isHandInProgress() {
-        return isHandInProgress;
-    }
-
-    public void setHandInProgress(boolean handInProgress) {
-        isHandInProgress = handInProgress;
-    }
-
-    private boolean isHandInProgress;
     public int getHandCount() {
         return handCount;
     }
@@ -60,15 +56,13 @@ public class GameState implements Serializable {
     private int dealCount;
     private int currentDealer;
 
-    public ScoreBoardItemAdapter getRecordAdapter() {
-        return recordAdapter;
+    public CurrentHandState getCurrentHandState() {
+        return currentHandState;
     }
 
-    public void setRecordAdapter(ScoreBoardItemAdapter adapter) {
-        recordAdapter = adapter;
+    public void setCurrentHandState(CurrentHandState currentHandState) {
+        this.currentHandState = currentHandState;
     }
 
-    private ScoreBoardItemAdapter recordAdapter;
-
-
+    private CurrentHandState currentHandState;
 }

@@ -1,9 +1,10 @@
 package com.aprivate.sean.ohcg;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Random;
 
-public class ScoreBoardItem {
+public class ScoreBoardItem implements Serializable {
     private static Random random = new Random();
 
     public ScoreBoardItem(){

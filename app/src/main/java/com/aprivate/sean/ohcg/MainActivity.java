@@ -49,20 +49,20 @@ public class MainActivity extends AppCompatActivity {
         });
         gameState = new GameState();
 
-        gameState.setRecordAdapter(new ScoreBoardItemAdapter(this, new ArrayList<ScoreBoardItem>()));
+        Global.setRecordAdapter(new ScoreBoardItemAdapter(this, new ArrayList<ScoreBoardItem>()));
         final ListView recordsView = (ListView) findViewById(R.id.scoreBoardList);
-        recordsView.setAdapter(gameState.getRecordAdapter());
+        recordsView.setAdapter(Global.getRecordAdapter());
         recordsView.setItemsCanFocus(true);
         recordsView.setOnItemClickListener((adapterView, view, i, l) -> {
             Intent intent = new Intent(MainActivity.this, EditPlayer.class);
             intent.putExtra("player", i);
-            startActivityForResult(intent, 1);
+            startActivityForResult(intent, Global.EDIT_ORDER);
         });
         gameState.setCurrentDealer(-1);
     }
 
     private void onEditHandClick(Button editHandButtonObj) {
-        gameState.setEditOfHand(true);
+        gameState.setHandState(HandState.EditHand);
         //whether starting or ending the hand, want to go ahead and use record bids and just alter behavior based on flow.
         Intent intent = new Intent(this, RecordBids.class);
         intent.putExtra("gameState", gameState);
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void onStartHandClick(Button startEndHandButtonObj) {
         int activityId;
-        if (gameState.isHandInProgress()) {
+        if (gameState.getHandState() != HandState.BeginningOfHand) {
             activityId = Global.END_HAND;
         }
         else {
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(!gameState.isGameInProgress()) {
             gameState.setGameInProgress(true);
-            int recordCount = gameState.getRecordAdapter().getCount();
+            int recordCount = Global.getRecordAdapter().getCount();
             if (recordCount < 2) {
                 AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
                 dlgAlert.setMessage("You must have at least two players");
@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onAddPlayersClick(View button){
         Intent intent = new Intent(this, NewPlayers.class);
+        intent.putExtra("gameState", gameState);
         startActivity(intent);
     }
 
@@ -139,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle extras = data.getExtras();
+        if(requestCode == Global.EDIT_ORDER){
+            return;
+        }
         Serializable retrievedState = extras.getSerializable("gameState");
 
         if(retrievedState != null){
@@ -146,20 +150,24 @@ public class MainActivity extends AppCompatActivity {
         }
         Button startEndHandButton = findViewById(R.id.startEndHandButton);
         Button editHandButton = findViewById(R.id.editHandButton);
+        TextView overUnderLabel = findViewById(R.id.labelUnderOrOver);
 
         switch(requestCode) {
-            case (Global.START_HAND) : {
+            case (Global.EDIT_HAND):
+            case (Global.START_HAND): {
                 if (resultCode == Activity.RESULT_OK) {
-                    gameState.setHandInProgress(true);
+                    gameState.setHandState(HandState.EndOfHand);
                     startEndHandButton.setText(R.string.endHandStr);
                     editHandButton.setVisibility(View.VISIBLE);
+                    overUnderLabel.setText(gameState.getDealCount() < gameState.getCurrentHandState().getTotalBidsForCurrentHand() ? "Over" : "Under");
                 }
                 break;
             }
             case (Global.END_HAND) :{
                 startEndHandButton.setText(R.string.beginHandStr);
-                gameState.setHandInProgress(false);
+                gameState.setHandState(HandState.BeginningOfHand);
                 editHandButton.setVisibility(View.INVISIBLE);
+                overUnderLabel.setText("");
                 break;
             }
         }

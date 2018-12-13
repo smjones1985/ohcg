@@ -17,7 +17,6 @@ public class NewPlayers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_players);
-
         Button addPlayerButtonObj = (Button) findViewById(R.id.addPlayer);
         addPlayerButtonObj.setOnClickListener((view) -> {
             addPlayer(addPlayerButtonObj);
