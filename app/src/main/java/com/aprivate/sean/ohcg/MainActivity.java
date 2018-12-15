@@ -159,7 +159,14 @@ public class MainActivity extends AppCompatActivity {
                     gameState.setHandState(HandState.EndOfHand);
                     startEndHandButton.setText(R.string.endHandStr);
                     editHandButton.setVisibility(View.VISIBLE);
-                    overUnderLabel.setText(gameState.getDealCount() < gameState.getCurrentHandState().getTotalBidsForCurrentHand() ? "Over" : "Under");
+                    int amountOverUnder = gameState.getDealCount() - gameState.getCurrentHandState().getTotalBidsForCurrentHand();
+                    String overUnderText;
+                    if(amountOverUnder > 0){
+                        overUnderText = amountOverUnder + " under";
+                    }else{
+                        overUnderText = (amountOverUnder * -1) + " over";
+                    }
+                    overUnderLabel.setText(overUnderText);
                 }
                 break;
             }

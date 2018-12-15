@@ -300,10 +300,12 @@ public class RecordBids extends AppCompatActivity {
         gameState = (GameState) extras.getSerializable("gameState");
 
         gameState.setDealCount(Calculate.calculateWithEstablishedCardsDealt(players.size(), gameState.getHandCount()));
-        if(gameState.getDealCount() * players.size() == 54){
-            showAlert("Jokers are in! Deal them all!", "Notification");
-        }else{
-            showAlert("Deal " + gameState.getDealCount(), "Notification");
+        if(gameState.getHandState() != HandState.EndOfHand) {
+            if (gameState.getDealCount() * players.size() == 54) {
+                showAlert("Jokers are in! Deal them all!", "Notification");
+            } else {
+                showAlert("Deal " + gameState.getDealCount(), "Notification");
+            }
         }
     }
 

@@ -95,4 +95,14 @@ public class ScoreBoardItem implements Serializable {
     public void setOrder(int order) {
         this.order = order;
     }
+
+    private boolean activeInGame;
+
+    public boolean isActiveInGame() {
+        return activeInGame;
+    }
+
+    public void setActiveInGame(boolean activeInGame) {
+        this.activeInGame = activeInGame;
+    }
 }
