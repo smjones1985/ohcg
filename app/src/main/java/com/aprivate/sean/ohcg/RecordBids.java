@@ -7,12 +7,10 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,14 +25,8 @@ public class RecordBids extends AppCompatActivity {
     private TextView bidLabel;
     private CheckBox dealerBox;
 
-    private int currentIndex = 0;
-    private int maxIndex = 1;
-    private int handCount = 0;
-    private int cardsToDealForNewHand;
-    private int dealerId = -1;
-    private boolean isEndOfHand;
-    private int totalBidsForCurrentHand;
-
+    private GameState gameState;
+    private CurrentHandState currentHandState;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -42,50 +34,56 @@ public class RecordBids extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            ScoreBoardItem currentPlayer = (ScoreBoardItem) Global.getRecordAdapter().getItem(currentIndex);
-            if(!isEndOfHand) {
+            ScoreBoardItem currentPlayer = currentHandState.getPlayerOrderMapToIndex().get(currentHandState.getCurrentOrderNumber());
+            if(gameState.getHandState() != HandState.EndOfHand) {
                 recordBid(currentPlayer, String.valueOf(playerBid.getText()));
             }else{
                 recordTricks(currentPlayer, String.valueOf(playerBid.getText()));
             }
 
             if(dealerBox.isChecked()){
-                dealerId = currentPlayer.getIdNumber();
+                gameState.setCurrentDealer(currentPlayer.getIdNumber());
             }
 
+
+            int currentOrderNumber = currentHandState.getCurrentOrderNumber();
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard_finish:
                     onBackPressed();
                     break;
                 case R.id.navigation_dashboard_previous:
-                    if(currentIndex - 1 < 0){
-                        currentIndex = maxIndex;
+                    if(currentOrderNumber - 1 < 1){
+                        currentOrderNumber = Global.getRecordAdapter().getCount();
                     }else{
-                        currentIndex--;
+                        currentOrderNumber--;
                     }
                     break;
                 case R.id.navigation_dashboard_next:
-                    if(currentIndex + 1 > maxIndex){
-                        currentIndex = 0;
+                    if(currentOrderNumber + 1 > Global.getRecordAdapter().getCount()){
+                        currentOrderNumber = 1;
                     }else{
-                        currentIndex++;
+                        currentOrderNumber++;
                     }
                     break;
             }
 
-            ScoreBoardItem playerItem = (ScoreBoardItem) Global.getRecordAdapter().getItem(currentIndex);
-            if(!isEndOfHand) {
+            currentHandState.setCurrentOrderNumber(currentOrderNumber);
+            ScoreBoardItem playerItem = currentHandState.getPlayerOrderMapToIndex().get(currentOrderNumber);
+            if(gameState.getHandState() != HandState.EndOfHand) {
                 playerBid.setText(playerItem.getCurrentBid());
             }else{
                 playerBid.setText(String.valueOf(playerItem.getCurrentTricksTaken()));
             }
             playerNameField.setText(playerItem.getPlayerName());
-            dealerBox.setChecked(playerItem.getIdNumber() == dealerId);
+            dealerBox.setChecked(playerItem.getIdNumber() == gameState.getCurrentDealer());
             return true;
         }
     };
     private List<ScoreBoardItem> players;
     private HashMap<Integer, RecordedHand> recordedHands;
+    private HashMap<String, Button> buttonHashMap;
+
+
 
     private void recordTricks(ScoreBoardItem currentPlayer, String tricksTaken) {
         if(recordedHands == null) {
@@ -93,7 +91,7 @@ public class RecordBids extends AppCompatActivity {
         }
         RecordedHand recordedHand = new RecordedHand();
         recordedHand.setBid(Integer.valueOf(currentPlayer.getCurrentBid()));
-        recordedHand.setHand(handCount);
+        recordedHand.setHand(gameState.getHandCount());
         recordedHand.setTricksTaken(Integer.valueOf(tricksTaken));
         recordedHands.put(currentPlayer.getIdNumber(), recordedHand);
         currentPlayer.setCurrentTricksTaken(recordedHand.getTricksTaken());
@@ -113,34 +111,22 @@ public class RecordBids extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        if(!isEndOfHand) {
-            if (dealerId < 0) {
-                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-                dlgAlert.setMessage("A dealer must be set");
-                dlgAlert.setTitle("Error");
-                dlgAlert.setCancelable(true);
-                dlgAlert.create().show();
+        if(gameState.getHandState() != HandState.EndOfHand) {
+            if (gameState.getCurrentDealer() < 0) {
+                showAlert("A dealer must be set", "Error");
                 return;
 
-            } else if (totalBidsForCurrentHand == cardsToDealForNewHand) {
-                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-                ScoreBoardItem dealer = (ScoreBoardItem) Global.getRecordAdapter().getItem(dealerId);
-                dlgAlert.setMessage(String.format("%s cannot bid %s. Please, change bid.", dealer.getPlayerName(), dealer.getCurrentBid()));
-                dlgAlert.setTitle("Error");
-                dlgAlert.setCancelable(true);
-                dlgAlert.create().show();
+            } else if (currentHandState.getTotalBidsForCurrentHand() == gameState.getDealCount()) {
+                ScoreBoardItem dealer = Global.getRecordAdapter().getById(gameState.getCurrentDealer());
+                showAlert(String.format("%s cannot bid %s. Please, change bid.", dealer.getPlayerName(), dealer.getCurrentBid()), "Error");
                 return;
 
             }
         } else{
 
             int totalTricksTaken = players.stream().mapToInt(ScoreBoardItem::getCurrentTricksTaken).sum();
-            if(cardsToDealForNewHand != totalTricksTaken){
-                AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-                dlgAlert.setMessage("Tricks taken cannot equal the number of tricks bid");
-                dlgAlert.setTitle("Error");
-                dlgAlert.setCancelable(true);
-                dlgAlert.create().show();
+            if(gameState.getDealCount() != totalTricksTaken){
+                showAlert("Tricks taken cannot equal the number of tricks bid", "Error");
                 return;
             }
 
@@ -149,34 +135,27 @@ public class RecordBids extends AppCompatActivity {
 
                 boolean result = recordTricksFinal(player);
                 if(!result){
-                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
-                    dlgAlert.setMessage("Error recording tricks for " + player.getPlayerName());
-                    dlgAlert.setTitle("Error");
-                    dlgAlert.setCancelable(true);
-                    dlgAlert.create().show();
+                    showAlert("Error recording tricks for " + player.getPlayerName(), "Error");
                     return;
                 }
             }
-            establishRankings();
-
         }
-
+        gameState.setCurrentHandState(currentHandState);
         Intent output = new Intent();
-        output.putExtra("dealCount", cardsToDealForNewHand);
-        output.putExtra("handCount", handCount);
-        output.putExtra("currentDealer", dealerId);
+        output.putExtra("gameState", gameState);
         setResult(RESULT_OK, output);
         finish();
 
     }
 
-    public void establishRankings() {
-        Collections.sort(players, (player1, player2) -> player1.getCurrentPoints() < player2.getCurrentPoints() ? 1 : player1.getCurrentPoints() == player2.getCurrentPoints() ? 0 : -1);
-        int rank = 1;
-        for (ScoreBoardItem player : players){
-            player.setBoardRank(rank++);
-        }
+    private void showAlert(String message, String title) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+        dlgAlert.setMessage(message);
+        dlgAlert.setTitle(title);
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
     }
+
 
     private boolean recordTricksFinal(ScoreBoardItem currentPlayer) {
         RecordedHand recordedHand = recordedHands.getOrDefault(currentPlayer.getIdNumber(), null);
@@ -195,8 +174,8 @@ public class RecordBids extends AppCompatActivity {
 
     private void recordBid(ScoreBoardItem currentPlayer, String bid) {
         currentPlayer.setCurrentBid(bid);
-        totalBidsForCurrentHand = getCurrentBids();
-        tricksOutField.setText(String.valueOf(totalBidsForCurrentHand));
+        currentHandState.setTotalBidsForCurrentHand(getCurrentBids());
+        tricksOutField.setText(String.valueOf(currentHandState.getTotalBidsForCurrentHand()));
         Global.getRecordAdapter().update(currentPlayer);
     }
 
@@ -212,22 +191,41 @@ public class RecordBids extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_bids);
+        currentHandState = new CurrentHandState();
         initializeScreenObjects();
         loadPlayersAndGetExtras(savedInstanceState);
 
-        if(!isEndOfHand){
-            players.stream().forEach(x -> x.setCurrentBid("0"));
-        }else{
+        players.stream().forEach(x -> {
+            if(gameState.getHandState() == HandState.BeginningOfHand) {
+                x.setCurrentBid("0");
+            } else {
+                x.setCurrentTricksTaken(Integer.parseInt(x.getCurrentBid()));
+                recordTricks(x, x.getCurrentBid());
+            }
 
-            players.stream().forEach(x -> {
-                    x.setCurrentTricksTaken(Integer.parseInt(x.getCurrentBid()));
-                    recordTricks(x, x.getCurrentBid());
-            });
-            totalBidsForCurrentHand = getCurrentBids();
-        }
-        ScoreBoardItem playerItem = players.get(currentIndex);
+
+            if(currentHandState.playerOrderMapToIndex == null){
+                currentHandState.playerOrderMapToIndex = new HashMap<>();
+            }
+            currentHandState.playerOrderMapToIndex.put(x.getOrder(), x);
+        });
+
+        currentHandState.setTotalBidsForCurrentHand(getCurrentBids());
+
+        ScoreBoardItem playerItem = getFirstPlayerToBid();
         updateLabels();
         populateLayoutFields(playerItem);
+    }
+
+    private ScoreBoardItem getFirstPlayerToBid() {
+        int firstToBidIndex = 1;
+        ScoreBoardItem dealer = gameState.getCurrentDealer() > 0 ? currentHandState.playerOrderMapToIndex.get(gameState.getCurrentDealer()) : null;
+        if(dealer != null) {
+            if (dealer.getOrder() + 1 <= players.size()){
+                firstToBidIndex = dealer.getOrder() + 1;
+            }
+        }
+        return currentHandState.playerOrderMapToIndex.get(firstToBidIndex);
     }
 
     private void initializeScreenObjects() {
@@ -239,12 +237,42 @@ public class RecordBids extends AppCompatActivity {
         bidLabel = findViewById(R.id.bidLabel);
         tricksOutField = findViewById(R.id.tricksOutValueText);
         dealerBox = findViewById(R.id.dealerCheckBox);
+        if(buttonHashMap == null){
+            buttonHashMap = new HashMap<>();
+        }
+        buttonHashMap.put("0", findViewById(R.id.button0));
+        buttonHashMap.put("1", findViewById(R.id.button1));
+        buttonHashMap.put("2", findViewById(R.id.button2));
+        buttonHashMap.put("3", findViewById(R.id.button3));
+        buttonHashMap.put("4", findViewById(R.id.button4));
+        buttonHashMap.put("5", findViewById(R.id.button5));
+        buttonHashMap.put("6", findViewById(R.id.button6));
+        buttonHashMap.put("7", findViewById(R.id.button7));
+        buttonHashMap.put("8", findViewById(R.id.button8));
+        buttonHashMap.put("9", findViewById(R.id.button9));
+        buttonHashMap.put("c", findViewById(R.id.buttonC));
+
+        for (Button button : buttonHashMap.values()) {
+            button.setOnClickListener((view) -> {
+                onNumberButtonClick(button);
+            });
+
+        }
+    }
+
+    private void onNumberButtonClick(Button button) {
+        if(button.getText().toString().equalsIgnoreCase("C")){
+            playerBid.setText("0");
+        }else{
+            playerBid.setText(button.getText().toString());
+        }
+
     }
 
     private void updateLabels() {
-        String title = isEndOfHand ? "End of Hand" : "Record Bids";
-        String bidLabelContent = isEndOfHand ? "Tricks:" : "Bid:";
-        if(isEndOfHand){
+        String title = gameState.getHandState() == HandState.EndOfHand ? "End of Hand" : "Record Bids";
+        String bidLabelContent = gameState.getHandState() == HandState.EndOfHand ? "Tricks:" : "Bid:";
+        if(gameState.getHandState() == HandState.EndOfHand ){
             tricksOutLabel.setText("Tricks Taken:");
         } else{
             tricksOutLabel.setText("Tricks Out:");
@@ -256,26 +284,28 @@ public class RecordBids extends AppCompatActivity {
     }
 
     private void populateLayoutFields(ScoreBoardItem playerItem) {
-        dealCountObjectForRecordBids.setText(String.valueOf(cardsToDealForNewHand));
+        dealCountObjectForRecordBids.setText(String.valueOf(gameState.getDealCount()));
         playerNameField.setText(playerItem.getPlayerName());
         playerBid.setText(String.valueOf(playerItem.getCurrentBid()));
-        dealerBox.setChecked(playerItem.getIdNumber() == dealerId);
+        dealerBox.setChecked(playerItem.getIdNumber() == gameState.getCurrentDealer());
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
     private void loadPlayersAndGetExtras(Bundle savedInstanceState) {
-        maxIndex = Global.getRecordAdapter().getCount() - 1;
         players = Global.getRecordAdapter().getScoreBoardItems();
         Bundle extras = null;
         if (savedInstanceState == null) {
             extras = getIntent().getExtras();
         }
-        isEndOfHand = extras.getBoolean(getString(R.string.extraKey_isHandInProgress));
-        handCount = extras.getInt("handCount");
-        cardsToDealForNewHand = Calculate.calculateWithEstablishedCardsDealt(players.size(), handCount);
+        gameState = (GameState) extras.getSerializable("gameState");
 
-        if(isEndOfHand) {
-            dealerId = extras.getInt("currentDealer");
+        gameState.setDealCount(Calculate.calculateWithEstablishedCardsDealt(players.size(), gameState.getHandCount()));
+        if(gameState.getHandState() != HandState.EndOfHand) {
+            if (gameState.getDealCount() * players.size() == 54) {
+                showAlert("Jokers are in! Deal them all!", "Notification");
+            } else {
+                showAlert("Deal " + gameState.getDealCount(), "Notification");
+            }
         }
     }
 

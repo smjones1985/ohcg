@@ -11,4 +11,5 @@
     <string name="beginHandStr">Begin Hand</string>
     <string name="startGameStr">Start Game</string>
     <string name="extraKey_isHandInProgress">isHandInProgress</string>
+    <string name="extraKey_editHand">Edit</string>
 </resources>

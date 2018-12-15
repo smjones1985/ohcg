@@ -1,8 +1,9 @@
 package com.aprivate.sean.ohcg;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public class RecordedHand {
+public class RecordedHand implements Serializable {
 
     private static Random random = new Random();
 

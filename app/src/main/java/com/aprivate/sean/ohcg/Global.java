@@ -1,9 +1,12 @@
 package com.aprivate.sean.ohcg;
 
-import java.util.HashMap;
-import java.util.List;
 
 public class Global {
+    public static final int EDIT_HAND = 2;
+    public static final int START_HAND = 0;
+    public static final int END_HAND = 1;
+    public static final int EDIT_ORDER = 3;
+
     public static ScoreBoardItemAdapter getRecordAdapter() {
         return recordAdapter;
     }
@@ -13,20 +16,4 @@ public class Global {
     }
 
     private static ScoreBoardItemAdapter recordAdapter;
-
-
-    public static final int START_HAND = 0;
-    public static final int END_HAND = 1;
-
-    public static List<HashMap<String, ScoreBoardItem>> getTotalScoreForGame() {
-        return totalScoreForGame;
-    }
-
-    public static void setTotalScoreForGame(List<HashMap<String, ScoreBoardItem>> scoreForGame) {
-        Global.totalScoreForGame = scoreForGame;
-    }
-
-    private static List<HashMap<String, ScoreBoardItem>> totalScoreForGame;
-
-
 }

@@ -1,9 +1,10 @@
 package com.aprivate.sean.ohcg;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Random;
 
-public class ScoreBoardItem {
+public class ScoreBoardItem implements Serializable {
     private static Random random = new Random();
 
     public ScoreBoardItem(){
@@ -85,6 +86,23 @@ public class ScoreBoardItem {
         recordedHands.put(record.getHand(), record);
     }
 
+    private int order;
 
+    public int getOrder() {
+        return order;
+    }
 
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    private boolean activeInGame;
+
+    public boolean isActiveInGame() {
+        return activeInGame;
+    }
+
+    public void setActiveInGame(boolean activeInGame) {
+        this.activeInGame = activeInGame;
+    }
 }

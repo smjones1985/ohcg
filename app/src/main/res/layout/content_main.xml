@@ -9,6 +9,23 @@
     tools:showIn="@layout/activity_main">
 
     <Button
+        android:id="@+id/editHandButton"
+        android:layout_width="111dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Edit Hand"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/startEndHandButton"
+        app:layout_constraintVertical_bias="0.333" />
+
+    <Button
         android:id="@+id/startEndHandButton"
         android:layout_width="111dp"
         android:layout_height="wrap_content"
@@ -97,7 +114,7 @@
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.974" />
+        app:layout_constraintVertical_bias="0.909" />
 
     <Button
         android:id="@+id/startGameButton"
@@ -113,7 +130,7 @@
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/scoreBoard"
-        app:layout_constraintVertical_bias="0.982" />
+        app:layout_constraintVertical_bias="0.78" />
 
     <android.support.constraint.Group
         android:id="@+id/group"
@@ -152,7 +169,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="serif"
-                android:text="CurrentBid"
+                android:text="Bid"
                 android:textColor="#000" />
 
             <TextView
@@ -166,11 +183,19 @@
 
             <TextView
                 android:id="@+id/rank"
-                android:layout_width="9dp"
+                android:layout_width="11dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="serif"
                 android:text="Rank"
+                android:textColor="#000" />
+            <TextView
+                android:id="@+id/order"
+                android:layout_width="11dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="serif"
+                android:text="Order"
                 android:textColor="#000" />
 
         </TableRow>
@@ -187,5 +212,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/labelUnderOrOver"
+        android:layout_width="59dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.135"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dealLabel"
+        app:layout_constraintVertical_bias="0.035" />
 
 </android.support.constraint.ConstraintLayout>

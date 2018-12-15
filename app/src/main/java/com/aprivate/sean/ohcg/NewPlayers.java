@@ -17,7 +17,6 @@ public class NewPlayers extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_players);
-
         Button addPlayerButtonObj = (Button) findViewById(R.id.addPlayer);
         addPlayerButtonObj.setOnClickListener((view) -> {
             addPlayer(addPlayerButtonObj);
@@ -33,15 +32,22 @@ public class NewPlayers extends AppCompatActivity {
         onBackPressed();
     }
 
+    @Override
+    public void onBackPressed() {
+
+        super.onBackPressed();
+    }
+
     private void addPlayer(Button addPlayerButtonObj) {
         EditText playerNameTextBox = (EditText) findViewById(R.id.editPlayerName);
         String name = playerNameTextBox.getText().toString();
-        if(name != null && name != "" && !Global.getRecordAdapter().getScoreBoardItems().stream().anyMatch(x -> x.getPlayerName().equalsIgnoreCase(name))) {
+        if(name != null && !name.equalsIgnoreCase("") && !Global.getRecordAdapter().getScoreBoardItems().stream().anyMatch(x -> x.getPlayerName().equalsIgnoreCase(name))) {
             ScoreBoardItem newPlayer = new ScoreBoardItem();
             newPlayer.setCurrentBid("0");
             newPlayer.setBoardRank(0);
             newPlayer.setCurrentPoints(0);
             newPlayer.setPlayerName(name);
+            newPlayer.setOrder(Global.getRecordAdapter().getCount() + 1);
             Global.getRecordAdapter().add(newPlayer);
             TextView playerAddedLabelObj = (TextView) findViewById(R.id.playerAddedLabel);
             playerAddedLabelObj.setText(name + " has been added!");

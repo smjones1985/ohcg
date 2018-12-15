@@ -8,9 +8,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.Collections;
 import java.util.List;
 
-public class ScoreBoardItemAdapter extends BaseAdapter {
+public class ScoreBoardItemAdapter  extends BaseAdapter {
 
     private Context scoreBoardContext;
     private List<ScoreBoardItem> scoreBoardItems;
@@ -23,6 +24,14 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
     public void add(ScoreBoardItem record) {
         scoreBoardItems.add(record);
         notifyDataSetChanged();
+    }
+
+    public void establishRankings(List<ScoreBoardItem> players) {
+        Collections.sort(players, (player1, player2) -> player1.getCurrentPoints() < player2.getCurrentPoints() ? 1 : player1.getCurrentPoints() == player2.getCurrentPoints() ? 0 : -1);
+        int rank = 1;
+        for (ScoreBoardItem player : players){
+            player.setBoardRank(rank++);
+        }
     }
 
     public void update(ScoreBoardItem updateRecord){
@@ -39,6 +48,7 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
     public int getCount() {
         return scoreBoardItems.size();
     }
+
     @Override
     public Object getItem(int i) {
         return scoreBoardItems.get(i);
@@ -58,6 +68,10 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         RecordViewHolder holder;
 
+        if(i == 0){
+            establishRankings(scoreBoardItems);
+        }
+
         if (view ==null){
             LayoutInflater recordInflater = (LayoutInflater)
                     scoreBoardContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
@@ -68,6 +82,7 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
             holder.CurrentBid = (TextView) view.findViewById(R.id.currentBid);
             holder.TotalPts = (TextView) view.findViewById(R.id.totalPoints);
             holder.Rank = (TextView) view.findViewById(R.id.rank);
+            holder.Order = view.findViewById(R.id.order);
             view.setTag(holder);
         }else {
             holder = (RecordViewHolder) view.getTag();
@@ -78,7 +93,35 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
         holder.CurrentBid.setText(String.valueOf(scoreBoardItem.getCurrentBid()));
         holder.TotalPts.setText(String.valueOf(scoreBoardItem.getCurrentPoints()));
         holder.Rank.setText(String.valueOf(scoreBoardItem.getBoardRank()));
+        holder.Order.setText(String.valueOf(scoreBoardItem.getOrder()));
         return view;
+    }
+
+    public void updateOrderAndPoints(ScoreBoardItem player, int newOrderNumber, int newPoints) {
+        int previousOrder = player.getOrder();
+        for (ScoreBoardItem item : scoreBoardItems) {
+            if(item.getIdNumber() == player.getIdNumber()){
+                item.setOrder(newOrderNumber);
+                item.setCurrentPoints(newPoints);
+            }else if(item.getOrder() < previousOrder && item.getOrder() >= newOrderNumber){
+                item.setOrder(item.getOrder() + 1);
+                update(item);
+            } else if(item.getOrder() > previousOrder && item.getOrder() <= newOrderNumber){
+                item.setOrder(item.getOrder() - 1);
+            }else{
+                continue;
+            }
+            update(item);
+        }
+    }
+
+    public ScoreBoardItem getById(int currentDealer) {
+        for (ScoreBoardItem item : scoreBoardItems) {
+            if(item.getIdNumber() == currentDealer) {
+                return item;
+            }
+        }
+        return null;
     }
 
     private static class RecordViewHolder {
@@ -87,5 +130,6 @@ public class ScoreBoardItemAdapter extends BaseAdapter {
         public TextView CurrentBid;
         public TextView TotalPts;
         public TextView Rank;
+        public TextView Order;
     }
 }
