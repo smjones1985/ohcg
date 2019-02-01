@@ -1,14 +1,11 @@
 package com.aprivate.sean.ohcg
 
 import java.io.Serializable
-import java.util.HashMap
-import java.util.Random
+import java.util.*
 
 class ScoreBoardItem : Serializable {
 
-    var idNumber: Int = 0
-
-
+    var idNumber: UUID = UUID.randomUUID()
     var playerName: String? = null
 
     var currentBid: String? = null
@@ -24,7 +21,6 @@ class ScoreBoardItem : Serializable {
     var isActiveInGame: Boolean = false
 
     init {
-        idNumber = random.nextInt(Integer.MAX_VALUE)
         isActiveInGame = true
     }
 
@@ -39,9 +35,5 @@ class ScoreBoardItem : Serializable {
             recordedHands = HashMap()
         }
         recordedHands!![record.hand] = record
-    }
-
-    companion object {
-        private val random = Random()
     }
 }

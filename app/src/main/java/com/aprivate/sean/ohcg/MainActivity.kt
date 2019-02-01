@@ -3,6 +3,7 @@ package com.aprivate.sean.ohcg
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -12,11 +13,20 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
+import com.aprivate.sean.ohcg.dataBase.DbWorkerThread
+import com.aprivate.sean.ohcg.dataBase.GameStateDb
+import com.aprivate.sean.ohcg.dataBase.GameStateEntity
 import java.util.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
-    private var gameState: GameState? = null
+    private var gameState: GameState = GameState()
+    private var gsDb: GameStateDb? = null
+    private lateinit var mDbWorkerThread: DbWorkerThread
+//    private val mUiHandler = Handler()
+
+
+    private var previousGames: List<GameStateEntity> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +45,9 @@ class MainActivity : AppCompatActivity() {
 
         val editHandButtonObj = findViewById<View>(R.id.editHandButton) as Button
         editHandButtonObj.setOnClickListener { view -> onEditHandClick(editHandButtonObj) }
-        gameState = GameState()
+
+        mDbWorkerThread = DbWorkerThread("dbWorkerThread")
+        mDbWorkerThread.start()
 
         Global.recordAdapter = ScoreBoardItemAdapter(this, ArrayList())
         val recordsView = findViewById<View>(R.id.scoreBoardList) as ListView
@@ -46,7 +58,26 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("player", i)
             startActivityForResult(intent, Global.EDIT_ORDER)
         }
+
+        gsDb = GameStateDb.getInstance(applicationContext)
+        insertGameStateInDb(Utility().convertToEntity(gameState))
+        fetchGameStatesFromDb()
+
     }
+
+    private fun fetchGameStatesFromDb() {
+        val task = Runnable {
+            previousGames =
+                    gsDb?.gameStateDao()?.getAll()!!
+        }
+        mDbWorkerThread.postTask(task)
+    }
+
+    private fun insertGameStateInDb(gameState: GameStateEntity) {
+        val task = Runnable { gsDb?.gameStateDao()?.insertAll(gameState) }
+        mDbWorkerThread.postTask(task)
+    }
+
 
     private fun onEditHandClick(editHandButtonObj: Button) {
         gameState!!.handState = HandState.EditHand

@@ -1,6 +1,7 @@
 package com.aprivate.sean.ohcg
 
 
+
 object Global {
     val EDIT_HAND = 2
     val START_HAND = 0

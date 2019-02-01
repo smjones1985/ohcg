@@ -10,9 +10,7 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
-
-import java.util.ArrayList
-import java.util.HashMap
+import java.util.*
 
 class RecordBids : AppCompatActivity() {
 
@@ -75,7 +73,7 @@ class RecordBids : AppCompatActivity() {
         true
     }
     private var players: List<ScoreBoardItem>? = null
-    private var recordedHands: HashMap<Int, RecordedHand>? = null
+    private var recordedHands: HashMap<UUID, RecordedHand>? = null
     private var buttonHashMap: HashMap<String, Button>? = null
     private var inActivePlayers: List<ScoreBoardItem>? = null
     private var sortedOrderList: MutableList<Int>? = null
